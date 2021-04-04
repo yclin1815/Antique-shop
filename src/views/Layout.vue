@@ -14,10 +14,13 @@
             <router-link to="/" class="header-link">HOME</router-link>
           </li>
           <li>
+            <router-link to="/products" class="header-link">PRODUCTS</router-link>
+          </li>
+          <li>
             <router-link to="/about" class="header-link">ABOUT</router-link>
           </li>
           <li>
-            <router-link to="/products" class="header-link">PRODUCTS</router-link>
+            <router-link to="/contact" class="header-link">CONTACT</router-link>
           </li>
         </ul>
         <ul class="header-list">
@@ -261,7 +264,7 @@ export default {
     justify-content: space-around;
   }
   &.active {
-    max-height: 10.5rem;
+    max-height: 14rem;
     transition: 0.5s all ease-in;
   }
 }
