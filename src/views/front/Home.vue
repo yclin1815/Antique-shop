@@ -1,14 +1,19 @@
 <template>
-  <div class="wrap">
+  <div class="home">
     <loading :active.sync="isLoading" :is-full-page="true"></loading>
 
     <div class="banner" id="banner">
       <div class="banner-content">
         <!-- <h2 class="banner-title">Antique</h2> -->
-        <p class="banner-text">讓古董融入每天的生活，</p>
-        <p class="banner-text">
-          既是環保，更是一種日常的浪漫。
+        <p class="banner-text">讓古董融入每天的生活，既是環保，更是一種日常的浪漫。
         </p>
+        <router-link to="/products" class="btn btn-secondary btn-lg border">
+          立即選購
+          <span class="ml-3">
+            <i class="fas fa-store fa-lg"></i>
+          </span>
+        </router-link>
+
       </div>
       <a
         href="#banner"
@@ -37,51 +42,29 @@
         ></li>
       </ul>
     </div>
-
     <div class="intro">
-      <div class="container">
-        <div class="row">
-          <div class="col-12 col-lg-4 mb-5 mb-lg-0">
-            <div class="intro-item intro-img1">
-              <router-link
-                class="intro-content"
-                :to="{ name: 'Products', query: { categoryName: '家具商品' } }"
-              >
-                <h4 class="intro-title">家具商品</h4>
-                <p class="intro-text">
-                  歷久彌新經典設計家具，在日常中實踐簡單又美好體驗。
-                </p>
-              </router-link>
-            </div>
-          </div>
-          <div class="col-12 col-lg-4 mb-5 mb-lg-0">
-            <div class="intro-item intro-img2">
-              <router-link
-                class="intro-content"
-                :to="{ name: 'Products', query: { categoryName: '佈置擺飾' } }"
-              >
-                <h4 class="intro-title">佈置擺飾</h4>
-                <p class="intro-text">充滿老式情懷的復古道具，將過去的美好重現於居家氛圍中。</p>
-              </router-link>
-            </div>
-          </div>
-          <div class="col-12 col-lg-4 mb-5 mb-lg-0">
-            <div class="intro-item intro-img3">
-              <router-link
-                class="intro-content"
-                :to="{ name: 'Products', query: { categoryName: '底片相機' } }"
-              >
-                <h4 class="intro-title">底片相機</h4>
-                <p class="intro-text">
-                  底片的溫度無法被數位相機無法取代，找回攝影最初的感動。
-                </p>
-              </router-link>
-            </div>
-          </div>
-        </div>
+      <div class="intro-item intro-img1">
+        <router-link class="intro-content"
+          :to="{ name: 'Products', query: { categoryName: '家具商品' }}">
+          <h4 class="intro-title">家具商品</h4>
+          <p class="intro-text">歷久彌新經典設計家具，在日常中實踐簡單又美好體驗。</p>
+        </router-link>
+      </div>
+      <div class="intro-item intro-img2">
+        <router-link class="intro-content"
+          :to="{ name: 'Products', query: { categoryName: '佈置擺飾' }}">
+          <h4 class="intro-title">佈置擺飾</h4>
+          <p class="intro-text">充滿老式情懷的復古道具，將過去的美好重現於居家氛圍中。</p>
+        </router-link>
+      </div>
+      <div class="intro-item intro-img3">
+        <router-link class="intro-content"
+          :to="{ name: 'Products', query: { categoryName: '底片相機' }}">
+          <h4 class="intro-title">底片相機</h4>
+          <p class="intro-text">底片的溫度無法被數位相機無法取代，找回攝影最初的感動。</p>
+        </router-link>
       </div>
     </div>
-
     <div class="feature">
       <ul class="feature-img">
         <li
@@ -105,7 +88,6 @@
 
     <div class="cover">
       <h3 class="logo">Antique</h3>
-      <p></p>
     </div>
 
     <div class="feature">
@@ -115,7 +97,7 @@
           感謝每一位來店參觀的顧客，我們將持續以最專業的眼光選品，提供您兼具質感與品味的古董。
         </p>
       </div>
-      <div class="feature-swiper bg-info">
+      <div class="feature-swiper">
         <swiper class="swiper" :options="swiperOption">
           <swiper-slide v-for="feedback in feedbacks" :key="feedback.name">
             <div class="swiper-item">
@@ -143,19 +125,13 @@
     </div>
 
     <div class="map">
-      <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d4039.8515098548273!2d120.67342793351905!3d24.139514112986216!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x15a8fe0efac1c1f8!2z6Ie654Gj5bqc5YSS6ICD5qOa!5e0!3m2!1szh-TW!2stw!4v1617378481773!5m2!1szh-TW!2stw" width="600"
-        frameborder="0"
-        style="border: 0"
-        allowfullscreen=""
-        aria-hidden="false"
-        tabindex="0"
-      >
+      <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3640.7638693303306!2d120.6604659649888!3d24.144929384396363!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x34693da1ca018bd3%3A0xdf6594a4c18d0e9f!2z5a-p6KiIMzY45paw5Ym16IGa6JC9!5e0!3m2!1szh-TW!2stw!4v1617547471591!5m2!1szh-TW!2stw" frameborder="0" style="border: 0" allowfullscreen="" aria-hidden="false" tabindex="0">
       </iframe>
       <ul class="us">
-            <li class="logo">Antique</li>
-            <li>TEL： 0987654321</li>
-            <li>Mail： antique@mail.com</li>
-            <li>地址： 403台中市西區府後街38-8號</li>
+        <li class="logo">Antique</li>
+        <li>TEL： 0987654321</li>
+        <li>Mail： antique@mail.com</li>
+        <li>地址： 403台中市西區府後街38-8號</li>
       </ul>
     </div>
   </div>
@@ -225,7 +201,7 @@ export default {
 <style lang="scss" scoped>
 @import "@/assets/scss/all";
 
-.wrap {
+.home {
   background: url("../../assets/images/banner.jpg") center 85% no-repeat;
   background-size: cover;
   background-attachment: fixed;
@@ -240,7 +216,7 @@ export default {
 }
 
 .banner-content {
-  max-width: 500px;
+  max-width: 320px;
   padding: 2rem;
   background-color: rgba($dark, 0.4);
   text-align: center;
@@ -248,21 +224,10 @@ export default {
   color: $white;
   z-index: 99;
   @include mobile {
+    max-width: 420px;
     padding: 2rem 3rem;
   }
 }
-
-// .banner-title {
-//   margin-bottom: 4rem;
-//   animation: floating 3s infinite;
-//   font-family: $font-logo;
-//   font-size: 3rem;
-//   font-weight: bold;
-//   @include mobile {
-//     margin-bottom: 6rem;
-//     font-size: 5rem;
-//   }
-// }
 
 @keyframes floating {
   0% {
@@ -277,7 +242,7 @@ export default {
 }
 
 .banner-text {
-  margin-bottom: 0;
+  margin-bottom: 2rem;
   font-size: 1rem;
   line-height: 1.75;
   @include mobile {
@@ -383,8 +348,9 @@ export default {
 
 .feature-swiper {
   width: 100%;
-  margin: 2rem 0;
   padding: 0 1rem;
+  background-color: $info;
+  border-radius: 0.25rem;
   @include pad {
     width: 50%;
   }
@@ -407,22 +373,27 @@ export default {
 }
 
 .intro {
-  padding: 3rem 0 0;
-  background-color: $info;
-  @include mobile {
-    padding: 4rem 0;
+  background-color: $white;
+  overflow: hidden;
+  @include pad {
+    display: flex;
+    background-color: transparent;
   }
 }
 
 .intro-item {
   position: relative;
-  height: 100%;
-  min-height: 20rem;
+  min-height: 25rem;
+  margin-bottom: 0.5rem;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  border-radius: 0.25rem;
+  transition: all 0.5s ease;
   text-align: center;
+  @include pad {
+  flex: 0 0 33.33333%;
+  margin-bottom: 0;
+  }
   &:before {
     content: "";
     display: block;
@@ -439,7 +410,7 @@ export default {
     z-index: 1;
   }
   &:hover:before {
-    background: rgba($dark, 0.8);
+    background: none;
   }
 }
 
@@ -456,26 +427,35 @@ export default {
 }
 
 .intro-content {
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   position: absolute;
   top: 0;
   bottom: 0;
   right: 0;
   left: 0;
-  padding: 5rem;
-  z-index: 2;
+  margin: 1rem;
+  border: 1px solid $white;
+  transition: all 0.5s ease;
+  color: $white;
   &:hover {
-    color: $white;
     text-decoration: none;
   }
 }
 
 .intro-title {
+  z-index: 500;
   margin-bottom: 1.5rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid $white;
 }
 
 .intro-text {
+  z-index: 500;
+  max-width: 18rem;
   line-height: 1.75;
   letter-spacing: 0.25rem;
 }
@@ -508,7 +488,7 @@ export default {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  padding: 2rem 3rem;
+  padding: 1rem 1.8rem;
   background-color: $secondary;
   border-radius: 0.25rem;
   text-align: center;
