@@ -1,77 +1,84 @@
 <template>
-  <div class="products">
+  <div class="products-wrap">
     <loading :active.sync="isLoading" :is-full-page="true"></loading>
 
-    <div class="pagebanner"></div>
+    <div class="pagebanner" :style="{backgroundImage: 'url(' + bannerImg + ')'}"></div>
 
-    <div class="container">
-      <ul class="categories">
-        <li
-          class="categories-item"
-          v-for="category in categories"
-          :key="category.icon"
-          :class="{ active: category.title === filterCategory }"
-        >
-          <a href="#" @click.prevent="filterCategory = category.title">
-            <span class="mr-1">
-              <i :class="category.icon"></i>
-            </span>
-            {{ category.title }}
-          </a>
-        </li>
-      </ul>
-
+    <div class="container-fluid products">
       <div class="row">
-        <div
-          class="col-12 col-md-6 col-lg-4"
-          v-for="product in filterData"
-          :key="product.id"
-        >
-          <div class="card border-0">
-            <div
-              class="card-img"
-              :style="{ backgroundImage: 'url(' + product.imageUrl[0] + ')' }"
-            >
-              <div class="card-category">{{ product.category }}</div>
-            </div>
-            <div class="card-body text-center">
-              <h4 class="card-title">{{ product.title }}</h4>
-              <ul
-                class="card-price"
-                v-if="product.origin_price === product.price"
-              >
-                <li class="price">
-                  售價： {{ product.origin_price | currency }}
+        <div class="col-12 col-md-5 col-lg-3">
+          <div class="categories">
+            <h3 class="categories-title">產品分類</h3>
+              <ul class="categories-list">
+                <li v-for="category in categories" :key="category.key" :class="{ active: category.title === filterCategory }">
+                  <a href="#" class="categories-link" @click.prevent="getCategory(category)">
+                    {{ category.title }}
+                  </a>
                 </li>
               </ul>
-              <ul class="card-price" v-else>
-                <li class="price price-through">
-                  售價： {{ product.origin_price | currency }}
-                </li>
-                <li class="price">特價： {{ product.price | currency }}</li>
-              </ul>
-              <div class="card-btngroup">
-                <a
-                  href="#"
-                  class="btn btn-outline-dark btn-sm"
-                  @click.prevent="updateCartItem(product.id, 1)"
-                >
-                  <span class="mr-1">
-                    <i class="fas fa-cart-plus"></i>
-                  </span>
-                  加入購物車
-                </a>
-                <router-link
-                  :to="`/products/${product.id}`"
-                  class="btn btn-outline-dark btn-sm"
-                >
-                  <span class="mr-1">
-                    <i class="fas fa-info-circle"></i>
-                  </span>
-                  商品詳細
-                </router-link>
-              </div>
+          </div>
+          <div class="input-group search-inputgroup">
+            <input type="text" class="form-control" placeholder="請輸入搜尋商品"
+             v-model.trim="searchText" @keyup.enter="search()">
+            <div class="input-group-append">
+              <button class="btn btn-dark rounded-right" type="button"
+               @click.prevent="search()">
+                搜尋
+              </button>
             </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-7 col-lg-9">
+          <div class="products-info" v-if="filterText">
+            搜尋到 {{ filterData.length }} 筆 "{{ filterText }}" 資料
+          </div>
+          <div class="row">
+            <div class="col-12 col-lg-6 col-xl-4" v-for="product in filterData" :key="product.id">
+              <router-link :to="`/products/${product.id}`" class="card">
+                <div class="card-head">
+                  <div class="card-img-wrap">
+                    <span class="card-img" :style="{backgroundImage: 'url(' + product.imageUrl[0] + ')'}">
+                    </span>
+                  </div>
+                  <div class="card-category">{{ product.category }}</div>
+                  <a href="#" class="favorite-icon" @click.prevent="delFavoriteItem(product)"
+                   v-show="product.isFavorite">
+                   <i class="fas fa-heart"></i>
+                  </a>
+                  <a href="#" class="favorite-icon" @click.prevent="addFavorite(product)"
+                   v-show="!product.isFavorite">
+                    <i class="far fa-heart"></i>
+                  </a>
+                </div>
+                <div class="card-body text-center">
+                  <h4 class="card-title">{{ product.title }}</h4>
+                  <ul class="card-price" v-if="product.origin_price === product.price">
+                    <li class="price">
+                      售價： {{ product.origin_price | currency }}
+                    </li>
+                  </ul>
+                  <ul class="card-price" v-else>
+                    <li class="price price-through">
+                      售價： {{ product.origin_price | currency }}
+                    </li>
+                    <li class="price">
+                      特價： {{ product.price | currency }}
+                    </li>
+                  </ul>
+                  <a href="#" class="btn btn-dark btn-sm card-btn"
+                   @click.prevent="updateCartItem(product.id, 1)">
+                    <span class="mr-1">
+                      <i class="fas fa-shopping-basket"></i>
+                    </span>
+                    放入購物車
+                  </a>
+                </div>
+              </router-link>
+            </div>
+          </div>
+          <div class="products-pagination">
+            <Pagination :pages="pagination" @get-data="changePage"/>
           </div>
         </div>
       </div>
@@ -80,39 +87,57 @@
 </template>
 
 <script>
+import Pagination from '@/components/Pagination.vue'
+import bannerImgAllmenu from '@/assets/images/banner-allmenu.jpg'
+import bannerImgFurniture from '@/assets/images/banner-furniture.jpg'
+import bannerImgDeco from '@/assets/images/banner-deco.jpg'
+import bannerImgCamera from '@/assets/images/banner-camera.jpg'
+import bannerImgKitchen from '@/assets/images/banner-kitchen.jpg'
+import bannerImgCar from '@/assets/images/banner-car.jpg'
 export default {
   name: 'Products',
   data () {
     return {
       isLoading: false,
-      pagination: {},
-      products: {},
+      // 頁面相關
+      currentPage: 1, // 所在頁面
+      pagination: {
+        perpage: 6, // 一面有幾個商品
+        result_length: 0, // 商品數量
+        total_pages: 1, // 總共有幾頁
+        current_page: 1 // 所在頁面
+      },
+      products: [],
       carts: [],
+      favorites: {},
+      searchText: '',
+      filterText: '',
       filterCategory: '全部商品',
+      bannerImg: bannerImgAllmenu,
       categories: [
         {
           title: '全部商品',
-          icon: 'fas fa-archive'
+          bannerImg: bannerImgAllmenu
         },
         {
           title: '家具商品',
-          icon: 'fas fa-chair'
+          bannerImg: bannerImgFurniture
         },
         {
           title: '佈置擺飾',
-          icon: 'fas fa-leaf'
+          bannerImg: bannerImgDeco
         },
         {
           title: '底片相機',
-          icon: 'fas fa-camera-retro'
+          bannerImg: bannerImgCamera
         },
         {
           title: '廚房道具',
-          icon: 'fas fa-coffee'
+          bannerImg: bannerImgKitchen
         },
         {
           title: '古董汽車',
-          icon: 'fas fa-car-side'
+          bannerImg: bannerImgCar
         }
       ]
     }
@@ -125,6 +150,15 @@ export default {
       vm.$http.get(url).then((res) => {
         vm.products = res.data.data
         vm.pagination = res.data.meta.pagination
+        // 設定預設頁碼
+        const resultLen = vm.products.length
+        vm.pagination = {
+          perpage: 6, // 一面有幾個商品
+          result_length: resultLen,
+          total_pages: Math.ceil(resultLen / Number(vm.pagination.perpage)),
+          current_page: 1
+        }
+        vm.getFavorites()
         vm.getQuery()
         vm.isLoading = false
       })
@@ -180,24 +214,149 @@ export default {
           vm.$bus.$emit('alertmessage', msg)
         })
     },
+    getFavorites () {
+      const vm = this
+      vm.favorites = JSON.parse(localStorage.getItem('favoriteData')) || []
+
+      // 查詢各商品是否有在喜愛商品中，有則加入 isFavorite:true，否則加入 isFavorite:false
+      vm.products.forEach((productItem, index) => {
+        this.$set(vm.products[index], 'isFavorite', false)
+        vm.favorites.forEach((favoriteItem) => {
+          if (productItem.id === favoriteItem.id) {
+            this.$set(vm.products[index], 'isFavorite', true)
+          }
+        })
+      })
+    },
+    addFavorite (item) {
+      const vm = this
+      const favoriteData = {
+        id: item.id,
+        title: item.title,
+        imageUrl: item.imageUrl[0]
+      }
+      vm.favorites.push(favoriteData)
+      localStorage.setItem('favoriteData', JSON.stringify(vm.favorites))
+      const msg = {
+        icon: 'success',
+        title: '已加入喜愛商品'
+      }
+      vm.$bus.$emit('alertmessage', msg)
+      vm.$emit('get-favorites')
+      vm.getFavorites()
+    },
+    delFavoriteItem (item) {
+      const vm = this
+      vm.favorites.forEach((favoriteItem, index) => {
+        if (favoriteItem.id === item.id) {
+          vm.favorites.splice(index, 1)
+        }
+      })
+      localStorage.setItem('favoriteData', JSON.stringify(vm.favorites))
+      const msg = {
+        icon: 'success',
+        title: '已刪除喜愛商品'
+      }
+      vm.$bus.$emit('alertmessage', msg)
+      vm.$emit('get-favorites')
+      vm.getFavorites()
+    },
     getQuery () {
       const vm = this
       const { categoryName } = vm.$route.query
       if (categoryName) {
         vm.filterCategory = categoryName
+        vm.categories.forEach((item, index) => {
+          if (item.title === vm.filterCategory) {
+            vm.bannerImg = vm.categories[index].bannerImg
+          }
+        })
       }
+    },
+    getCategory (category) {
+      const vm = this
+      vm.filterCategory = category.title
+
+      // 切換分類，更換封面圖
+      vm.categories.forEach((item, index) => {
+        if (item.title === vm.filterCategory) {
+          vm.bannerImg = vm.categories[index].bannerImg
+        }
+      })
+
+      // 切換分類，所在頁面變為第一頁
+      vm.currentPage = 1
+      vm.pagination.current_page = 1
+
+      // 切換分類，清除搜尋
+      if (vm.filterText) {
+        vm.filterText = ''
+      }
+    },
+    search () {
+      const vm = this
+      if (vm.searchText) {
+        vm.filterCategory = '全部商品'
+        vm.filterText = vm.searchText
+        vm.searchText = ''
+      } else {
+        const msg = {
+          title: '請輸入搜尋文字',
+          text: '搜尋內容為空，請輸入搜尋文字',
+          status: 'danger'
+        }
+        vm.$bus.$emit('alertmessage', msg, 'modal')
+      }
+    },
+    changePage (currentPage) {
+      this.currentPage = currentPage
+      this.pagination.current_page = Number(currentPage)
     }
   },
   computed: {
     filterData () {
       const vm = this
-      if (vm.filterCategory !== '全部商品') {
-        return vm.products.filter(
-          (item) => item.category === vm.filterCategory
-        )
+      const data = []
+      let newProducts = vm.products
+
+      // 有搜尋字串
+      if (vm.filterText) {
+        vm.filterCategory = '全部商品'
+        newProducts = vm.products.filter((item) => item.title.indexOf(vm.filterText) !== -1)
       }
-      return vm.products
+      // 分類不為全部商品
+      if (vm.filterCategory !== '全部商品') {
+        newProducts = vm.products.filter((item) => item.category === vm.filterCategory)
+      }
+
+      // 當前顯示頁面資料、設定頁碼資訊
+      const resultLen = Number(newProducts.length)
+      const perpage = Number(vm.pagination.perpage)
+      vm.pagination.result_length = resultLen
+      vm.pagination.total_pages = Math.ceil(resultLen / perpage)
+
+      // 此頁碼最小資料為第?筆
+      const minItem = (vm.currentPage * perpage) - perpage + 1
+
+      // 此頁碼最大資料為第?筆
+      const maxItem = vm.currentPage * perpage
+
+      // 只取當前頁面資料
+      newProducts.forEach((item, i) => {
+        // 配合  minItem 及  maxItem 從 1 開始，所以 +1
+        const itemNum = i + 1
+        // 每頁 6 筆，以第 2 頁為例，只取第 7~12 筆
+        if (itemNum >= minItem && itemNum <= maxItem) {
+          data.push(item)
+        }
+      })
+      newProducts = data
+
+      return newProducts
     }
+  },
+  components: {
+    Pagination
   },
   created () {
     const vm = this
@@ -210,108 +369,117 @@ export default {
 <style lang="scss" scoped>
 @import "@/assets/scss/all";
 
-.products {
-  min-height: calc(100vh - 3.5rem - 3rem - 15rem);
-  @include pad {
-    min-height: calc(100vh - 3.5rem - 3rem - 20rem);
-  }
+.products-wrap {
+  min-height: calc( 100vh - 48px );
 }
 
 .pagebanner {
-  min-height: 15rem;
-  margin-bottom: 3rem;
-  background: url("../../assets/images/pagebanner.jpg") center no-repeat;
-  background-size: cover;
-  @include pad {
-    min-height: 20rem;
+  margin-bottom: 4rem;
+}
+
+.products {
+  padding: 0 2rem;
+}
+
+.search-inputgroup {
+  margin-bottom: 2rem;
+  button {
+    padding: 0.25rem 2rem;
+  }
+  input {
+    height: auto;
+    padding: 0.5rem 1rem;
+    border-color: $dark;
   }
 }
 
 .categories {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
   margin-bottom: 2rem;
-  @include pad {
-    margin-bottom: 0;
+  border-radius: 0.25rem;
+  text-align: center;
+}
+
+.categories-title {
+  margin-bottom: 0;
+  padding-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.categories-list {
+  border-top: 2px solid $dark;
+  border-radius: 4px;
+  padding: 1rem 1rem 1.5rem;
+  background-color: $light;
+  .active a {
+    background-color: $dark;
+    border-color: $dark;
+    color: $white;
+    &:hover {
+      background-color: lighten($dark, 10%);
+    }
   }
 }
 
-.categories-item {
-  margin-left: 1rem;
-  margin-bottom: 2rem;
-  position: relative;
-  background-color: $dark;
-  border: 2px solid $dark;
-  border-radius: 0.25rem;
-  transition: 0.3s all ease;
-  @include pad {
-    margin-bottom: 4rem;
-  }
-  a {
-    display: block;
-    padding: 0.5rem 1.5rem;
-  }
-  &:before {
-    content: "";
-    display: block;
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    width: 100%;
-    height: 100%;
-    background-color: $primary;
-    transition: 0.3s all ease;
-    border-radius: 0.25rem;
-    z-index: -1;
-  }
+.categories-link {
+  display: block;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid $muted;
+  color: $dark;
+  font-size: 1rem;
   &:hover {
-    background-color: $white;
-    a {
-      text-decoration: none;
-      color: $dark;
-    }
-  }
-  &.active {
     background-color: $primary;
-    &:hover {
-      background-color: $white;
-    }
-    a {
-      color: $dark;
-    }
-    &:before {
-      background-color: $dark;
-    }
+    border-color: $primary;
+    color: $white;
+    text-decoration: none;
   }
+}
+
+.products-info {
+  margin-bottom: 2rem;
 }
 
 .card {
   margin-bottom: 2rem;
-  overflow: hidden;
-  box-shadow: 0 0 4px 2px $primary;
-  @include desktop {
-    margin-bottom: 3rem;
+  transition: 0.5s all ease;
+  color: $dark;
+  &:hover {
+    box-shadow: 1px 2px 11px lighten($primary, 20%);
+    color: $dark;
+    text-decoration: none;
+    .card-img {
+      transform: scale(1.05);
+    }
   }
 }
 
-.card-img {
+.card-head {
   position: relative;
-  height: 10rem;
+  margin-bottom: 0.25rem;
+}
+
+.card-img-wrap {
+  overflow: hidden;
+}
+
+.card-img {
+  display: block;
+  width: 100%;
+  min-height: 10rem;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  transition: 0.5s all ease;
 }
 
 .card-category {
   position: absolute;
-  bottom: -0.5rem;
-  left: 45%;
+  bottom: -1rem;
+  left: 50%;
+  transform: translateX(-50%);
   padding: 0.25rem 0.5rem;
   background-color: $dark;
-  border-bottom-right-radius: 0.25rem;
+  border-radius: 0.25rem;
   color: $white;
-  font-size: 0.75rem;
 }
 
 .card-price {
@@ -322,18 +490,22 @@ export default {
 }
 
 .price {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
 }
 
 .price-through {
-  margin-right: 2rem;
-  color: $muted;
+  margin-right: 1rem;
+  color: $primary;
   font-size: 1rem;
   text-decoration: line-through;
 }
 
-.card-btngroup {
-  display: flex;
-  justify-content: space-between;
+.card-btn:hover {
+  background-color: $secondary;
+  border-color: $secondary;
+}
+
+.products-pagination {
+  margin: 0 auto 3rem;
 }
 </style>
