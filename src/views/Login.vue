@@ -28,7 +28,7 @@
           :class="classes"
           v-model="auth.email"
           required
-        />
+        >
         <span class="invalid-feedback">{{ errors[0] }}</span>
       </ValidationProvider>
 
@@ -48,7 +48,7 @@
           :class="classes"
           v-model="auth.password"
           required
-        />
+        >
         <span class="invalid-feedback">{{ errors[0] }}</span>
       </ValidationProvider>
 
@@ -71,11 +71,12 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'Login',
   data () {
     return {
-      isLoading: false,
       auth: {
         email: '',
         password: ''
@@ -86,7 +87,7 @@ export default {
     login () {
       const vm = this
       const apiUrl = `${process.env.VUE_APP_APIPATH}/auth/login`
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       vm.$http
         .post(apiUrl, vm.auth)
         .then((res) => {
@@ -94,19 +95,16 @@ export default {
           document.cookie = `hexToken=${token};expires=${new Date(
             expired * 1000
           )}; path=/`
-          vm.isLoading = false
-
+          vm.$store.dispatch('updateLoading', false, { root: true })
           const msg = {
             icon: 'success',
             title: '登入成功'
           }
           vm.$bus.$emit('alertmessage', msg)
-
           vm.$router.push('/admin/productsmanage')
         })
         .catch(() => {
-          vm.isLoading = false
-
+          vm.$store.dispatch('updateLoading', false, { root: true })
           const msg = {
             icon: 'error',
             title: '登入失敗'
@@ -114,6 +112,9 @@ export default {
           vm.$bus.$emit('alertmessage', msg)
         })
     }
+  },
+  computed: {
+    ...mapGetters(['isLoading'])
   }
 }
 </script>

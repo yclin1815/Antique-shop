@@ -1,10 +1,7 @@
 <template>
   <div class="product-wrap">
-    <loading :active.sync="isLoading" :is-full-page="true"></loading>
-
     <div class="pagebanner" :style="{backgroundImage: 'url(' + bannerImg + ')'}">
     </div>
-
     <div class="container">
       <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
@@ -12,12 +9,8 @@
             <router-link to="/"> 首頁 </router-link>
           </li>
           <li class="breadcrumb-item">
-            <router-link
-              :to="{
-                name: 'Products',
-                query: { categoryName: product.category },
-              }"
-            >
+            <router-link :to="{ name: 'Products', query: { categoryName: product.category },
+              }">
               {{ product.category }}
             </router-link>
           </li>
@@ -26,84 +19,65 @@
           </li>
         </ol>
       </nav>
-
       <div class="row mb-md-5">
         <div class="col-12 col-md-6 mb-4 mb-md-0">
           <div class="cover" v-if="product.imageUrl">
-            <div
-              class="cover-img"
-              :style="{ backgroundImage: 'url(' + product.imageUrl[0] + ')' }"
-            >
-            <a href="#" class="favorite-icon favorite-icon-lg"
-               @click.prevent="delFavoriteItem(product)"
-                v-show="isFavorite">
-                <i class="fas fa-heart"></i>
-
-              </a>
+            <div class="cover-img" :style="{ backgroundImage: 'url(' + product.imageUrl[0] + ')' }">
               <a href="#" class="favorite-icon favorite-icon-lg"
-               @click.prevent="addFavorite(product)"
-                v-show="!isFavorite">
+                @click.prevent="delFavoriteItem(product)"
+                  v-show="isFavorite">
+                  <i class="fas fa-heart"></i>
+              </a>
+              <a href="#" class="favorite-icon favorite-icon-lg" @click.prevent="addFavorite(product)" v-show="!isFavorite">
                 <i class="far fa-heart"></i>
               </a>
             </div>
           </div>
         </div>
         <div class="col-12 col-md-6">
-          <div class="text-center">
-            <h2 class="mb-2">{{ product.title }}</h2>
-            <h3 class="product-category">{{ product.category }}</h3>
-            <ul
-              class="product-price"
-              v-if="product.origin_price === product.price"
-            >
-              <li class="price">
-                售價： {{ product.origin_price | currency }}
-              </li>
-            </ul>
-            <ul class="product-price" v-else>
-              <li class="price price-through">
-                售價： {{ product.origin_price | currency }}
-              </li>
-              <li class="price">特價： {{ product.price | currency }}</li>
-            </ul>
-            <div class="product-cart">
-              <div class="counter">
-                <a href="#" class="lessNum" @click.prevent="lessNum()">
-                  <i class="fas fa-minus"></i>
-                </a>
-                <input type="number" min="1" readonly="readonly" class="counter-input"
-                 v-model="counterNum">
-                <a href="#" class="addNum" @click.prevent="counterNum += 1">
-                  <i class="fas fa-plus"></i>
-                </a>
-              </div>
-              <a href="#" class="btn btn-dark"
-               @click.prevent="updateCartItem(product.id)">
-                <span class="mr-1">
-                  <i class="fas fa-cart-plus"></i>
-                </span>
-                加入購物車
+        <div class="text-center">
+          <h2 class="mb-2">{{ product.title }}</h2>
+          <h3 class="product-category">{{ product.category }}</h3>
+          <ul class="product-price" v-if="product.origin_price === product.price">
+            <li class="price">
+              售價： {{ product.origin_price | currency }}
+            </li>
+          </ul>
+          <ul class="product-price" v-else>
+            <li class="price price-through">
+              售價： {{ product.origin_price | currency }}
+            </li>
+            <li class="price">特價： {{ product.price | currency }}</li>
+          </ul>
+          <div class="product-cart">
+            <div class="counter">
+              <a href="#" class="lessNum" @click.prevent="lessNum()">
+                <i class="fas fa-minus"></i>
+              </a>
+              <input type="number" min="1" readonly="readonly" class="counter-input"
+                v-model="counterNum">
+              <a href="#" class="addNum" @click.prevent="counterNum += 1">
+                <i class="fas fa-plus"></i>
               </a>
             </div>
-            <h4 class="product-subtitle">商品規格</h4>
-            <p class="product-text">
-              {{ product.content }}
-            </p>
-            <h4 class="product-subtitle">商品說明</h4>
-            <p v-html = "product.description" class="product-text">
-            </p>
+            <a href="#" class="btn btn-dark" @click.prevent="updateCartItem(product.id)">
+              <span class="mr-1">
+                <i class="fas fa-cart-plus"></i>
+              </span>
+              加入購物車
+            </a>
           </div>
+          <h4 class="product-subtitle">商品規格</h4>
+          <p class="product-text"> {{ product.content }} </p>
+          <h4 class="product-subtitle">商品說明</h4>
+          <p v-html = "product.description" class="product-text"></p>
+        </div>
         </div>
       </div>
-
       <h4 class="swiper-title">您可能會喜歡</h4>
       <swiper class="swiper" :options="swiperOption">
         <swiper-slide v-for="item in relatedProducts" :key="item.id">
-          <router-link
-            :to="`/products/${item.id}`"
-            :style="{ backgroundImage: 'url(' + item.imageUrl[0] + ')' }"
-            class="swipter-item"
-          >
+          <router-link :to="`/products/${item.id}`" :style="{ backgroundImage: 'url(' + item.imageUrl[0] + ')' }" class="swipter-item">
             <span class="swipter-item-category">{{ item.title }}</span>
           </router-link>
         </swiper-slide>
@@ -126,7 +100,6 @@ export default {
   name: 'Product',
   data () {
     return {
-      isLoading: false,
       categoryName: '',
       product: {},
       relatedProducts: [],
@@ -197,24 +170,23 @@ export default {
     getRelated (category) {
       const vm = this
       const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/products`
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       vm.$http.get(url).then((res) => {
         vm.relatedProducts = res.data.data.filter(
           (item) => item.category === category && item.id !== vm.product.id
         )
-
-        vm.isLoading = false
+        vm.$store.dispatch('updateLoading', false, { root: true })
       })
     },
     getProduct (id) {
       const vm = this
       const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/product/${id}`
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       vm.$http.get(url).then((res) => {
-        vm.isLoading = false
         vm.product = res.data.data
         vm.getRelated(vm.product.category)
         vm.getFavorites()
+        vm.$store.dispatch('updateLoading', false, { root: true })
         // 依分類設定封面圖
         vm.categories.forEach((item, index) => {
           if (item.title === vm.product.category) {
@@ -222,7 +194,7 @@ export default {
           }
         })
       }).catch(() => {
-        vm.isLoading = false
+        vm.$store.dispatch('updateLoading', false, { root: true })
         vm.$swal({
           title: '錯誤',
           text: '找不到此商品',
@@ -239,10 +211,10 @@ export default {
     getCarts () {
       const vm = this
       const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/shopping`
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       vm.$http.get(url).then((res) => {
         vm.carts = res.data.data
-        vm.isLoading = false
+        vm.$store.dispatch('updateLoading', false, { root: true })
       })
     },
     updateCartItem (id) {
@@ -250,27 +222,22 @@ export default {
       const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/shopping`
       let n = 0
       let method = 'post'
-
       n = Number(vm.counterNum)
-
       const isInCart = vm.carts.filter((item) => item.product.id === id)
-
       if (isInCart.length > 0) {
         method = 'patch'
         n = Number(isInCart[0].quantity) + Number(vm.counterNum)
       }
-
       const data = {
         product: id,
         quantity: n
       }
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       vm.$http[method](url, data)
         .then(() => {
-          vm.isLoading = false
           vm.getCarts()
           vm.$emit('get-carts')
-
+          vm.$store.dispatch('updateLoading', false, { root: true })
           const msg = {
             icon: 'success',
             title: '更新購物車成功'
@@ -278,8 +245,7 @@ export default {
           vm.$bus.$emit('alertmessage', msg)
         })
         .catch(() => {
-          vm.isLoading = false
-
+          vm.$store.dispatch('updateLoading', false, { root: true })
           const msg = {
             icon: 'error',
             title: '更新購物車失敗'
@@ -290,7 +256,6 @@ export default {
     getFavorites () {
       const vm = this
       vm.favorites = JSON.parse(localStorage.getItem('favoriteData')) || []
-
       // 查詢此商品是否在喜愛商品中
       vm.isFavorite = false
       vm.favorites.forEach((favoriteItem) => {

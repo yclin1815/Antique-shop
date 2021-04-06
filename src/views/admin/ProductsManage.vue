@@ -1,7 +1,5 @@
 <template>
   <div>
-    <loading :active.sync="isLoading" :is-full-page="true"></loading>
-
     <div class="mb-4 text-right">
       <button
         type="button"
@@ -11,7 +9,6 @@
         新增商品
       </button>
     </div>
-
     <div class="table-responsive">
       <table class="table table-striped">
         <thead>
@@ -297,7 +294,6 @@ export default {
   name: 'ProductsManage',
   data () {
     return {
-      isLoading: false,
       pagination: {},
       products: {},
       status: '',
@@ -310,27 +306,27 @@ export default {
     getProducts (page = 1) {
       const vm = this
       const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/admin/ec/products?page=${page}&paged=10`
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       vm.$http.get(url).then((res) => {
         vm.products = res.data.data
         vm.pagination = res.data.meta.pagination
-        vm.isLoading = false
+        vm.$store.dispatch('updateLoading', false, { root: true })
       })
     },
     getProduct (id) {
       const vm = this
       const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/admin/ec/product/${id}`
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       vm.$http
         .get(url)
         .then((res) => {
           vm.tempProduct = res.data.data
           $('#editModal').modal('show')
-          vm.isLoading = false
+          vm.$store.dispatch('updateLoading', false, { root: true })
         })
         .catch(() => {
           $('#editModal').modal('hide')
-          vm.isLoading = false
+          vm.$store.dispatch('updateLoading', false, { root: true })
           const msg = {
             icon: 'error',
             title: '載入商品失敗'
@@ -370,12 +366,12 @@ export default {
         url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/admin/ec/product/${vm.tempProduct.id}`
         status = '更新'
       }
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       vm.$http[method](url, vm.tempProduct)
         .then(() => {
-          vm.isLoading = false
-          vm.getProducts()
           $('#editModal').modal('hide')
+          vm.getProducts()
+          vm.$store.dispatch('updateLoading', false, { root: true })
           const msg = {
             icon: 'success',
             title: `${status}商品成功`
@@ -384,7 +380,7 @@ export default {
         })
         .catch(() => {
           $('#editModal').modal('hide')
-          vm.isLoading = false
+          vm.$store.dispatch('updateLoading', false, { root: true })
           const msg = {
             icon: 'error',
             title: `${status}商品失敗`
@@ -395,21 +391,21 @@ export default {
     delProduct () {
       const vm = this
       const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/admin/ec/product/${vm.tempProduct.id}`
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       vm.$http
         .delete(url)
         .then(() => {
           vm.getProducts()
           $('#delModal').modal('hide')
+          vm.$store.dispatch('updateLoading', false, { root: true })
           const msg = {
             icon: 'success',
             title: '刪除商品成功'
           }
-          vm.isLoading = false
           vm.$bus.$emit('alertmessage', msg)
         })
         .catch(() => {
-          vm.isLoading = false
+          vm.$store.dispatch('updateLoading', false, { root: true })
           const msg = {
             icon: 'error',
             title: '刪除商品失敗'
@@ -423,7 +419,7 @@ export default {
       const file = vm.$refs.file.files[0]
       const formData = new FormData()
       formData.append('file', file)
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/admin/storage`
       vm.$http
         .post(url, formData, {
@@ -440,7 +436,7 @@ export default {
             array.push(res.data.data.path)
             vm.tempProduct.imageUrl = array
           }
-          vm.isLoading = false
+          vm.$store.dispatch('updateLoading', false, { root: true })
           const msg = {
             icon: 'success',
             title: '上傳圖片成功'
@@ -448,7 +444,7 @@ export default {
           vm.$bus.$emit('alertmessage', msg)
         })
         .catch(() => {
-          vm.isLoading = false
+          vm.$store.dispatch('updateLoading', false, { root: true })
           const msg = {
             icon: 'error',
             title: '上傳圖片失敗，請確認檔案大小'

@@ -1,9 +1,6 @@
 <template>
   <div class="products-wrap">
-    <loading :active.sync="isLoading" :is-full-page="true"></loading>
-
     <div class="pagebanner" :style="{backgroundImage: 'url(' + bannerImg + ')'}"></div>
-
     <div class="container-fluid products">
       <div class="row">
         <div class="col-12 col-md-5 col-lg-3">
@@ -98,7 +95,6 @@ export default {
   name: 'Products',
   data () {
     return {
-      isLoading: false,
       // 頁面相關
       currentPage: 1, // 所在頁面
       pagination: {
@@ -146,7 +142,7 @@ export default {
     getProducts () {
       const vm = this
       const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/products`
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       vm.$http.get(url).then((res) => {
         vm.products = res.data.data
         vm.pagination = res.data.meta.pagination
@@ -160,16 +156,16 @@ export default {
         }
         vm.getFavorites()
         vm.getQuery()
-        vm.isLoading = false
+        vm.$store.dispatch('updateLoading', false, { root: true })
       })
     },
     getCarts () {
       const vm = this
       const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/shopping`
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       vm.$http.get(url).then((res) => {
         vm.carts = res.data.data
-        vm.isLoading = false
+        vm.$store.dispatch('updateLoading', false, { root: true })
       })
     },
     updateCartItem (id, num) {
@@ -177,27 +173,22 @@ export default {
       const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/shopping`
       let n = 0
       let method = 'post'
-
       n = Number(num)
-
       const isInCart = vm.carts.filter((item) => item.product.id === id)
-
       if (isInCart.length > 0) {
         method = 'patch'
         n = Number(isInCart[0].quantity) + Number(num)
       }
-
       const data = {
         product: id,
         quantity: n
       }
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       vm.$http[method](url, data)
         .then(() => {
-          vm.isLoading = false
           vm.getCarts()
           vm.$emit('get-carts')
-
+          vm.$store.dispatch('updateLoading', false, { root: true })
           const msg = {
             icon: 'success',
             title: '更新購物車成功'
@@ -205,8 +196,7 @@ export default {
           vm.$bus.$emit('alertmessage', msg)
         })
         .catch(() => {
-          vm.isLoading = false
-
+          vm.$store.dispatch('updateLoading', false, { root: true })
           const msg = {
             icon: 'error',
             title: '更新購物車失敗'
@@ -217,7 +207,6 @@ export default {
     getFavorites () {
       const vm = this
       vm.favorites = JSON.parse(localStorage.getItem('favoriteData')) || []
-
       // 查詢各商品是否有在喜愛商品中，有則加入 isFavorite:true，否則加入 isFavorite:false
       vm.products.forEach((productItem, index) => {
         this.$set(vm.products[index], 'isFavorite', false)
@@ -276,18 +265,15 @@ export default {
     getCategory (category) {
       const vm = this
       vm.filterCategory = category.title
-
       // 切換分類，更換封面圖
       vm.categories.forEach((item, index) => {
         if (item.title === vm.filterCategory) {
           vm.bannerImg = vm.categories[index].bannerImg
         }
       })
-
       // 切換分類，所在頁面變為第一頁
       vm.currentPage = 1
       vm.pagination.current_page = 1
-
       // 切換分類，清除搜尋
       if (vm.filterText) {
         vm.filterText = ''

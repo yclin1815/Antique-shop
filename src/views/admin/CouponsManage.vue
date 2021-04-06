@@ -1,17 +1,11 @@
 <template>
   <div>
-    <loading :active.sync="isLoading" :is-full-page="true"></loading>
-
     <div class="mb-4 text-right">
-      <button
-        type="button"
-        class="btn btn-dark"
-        @click.prevent="openModal('create')"
+      <button type="button" class="btn btn-dark" @click.prevent="openModal('create')"
       >
         新增優惠劵
       </button>
     </div>
-
     <div class="table-responsive">
       <table class="table table-striped">
         <thead>
@@ -42,19 +36,11 @@
             </td>
             <td>
               <div class="btn-group btn-group-sm">
-                <button
-                  type="button"
-                  class="btn btn-outline-dark"
-                  @click.prevent="openModal('update', item)"
-                >
-                  編輯
+                <button type="button" class="btn btn-outline-dark" @click.prevent="openModal('update', item)">
+                編輯
                 </button>
-                <button
-                  type="button"
-                  class="btn btn-outline-danger"
-                  @click.prevent="openModal('del', item)"
-                >
-                  刪除
+                <button type="button" class="btn btn-outline-danger" @click.prevent="openModal('del', item)">
+                 刪除
                 </button>
               </div>
             </td>
@@ -62,150 +48,73 @@
         </tbody>
       </table>
     </div>
-
     <!-- editModal -->
-    <div
-      class="modal fade"
-      id="editModal"
-      role="dialog"
-      aria-labelledby="editModalTitle"
-      aria-hidden="true"
-    >
+    <div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModalTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header bg-dark text-light">
             <h5 class="modal-title" id="editModalTitle">
               {{ status === "create" ? "新增優惠劵" : "更新優惠劵" }}
             </h5>
-            <button
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
             <div class="form-group">
               <label for="title">標題</label>
-              <input
-                type="title"
-                id="title"
-                class="form-control"
-                placeholder="請輸入標題"
-                v-model="tempCoupon.title"
-                required
-              />
+              <input type="title" id="title" class="form-control" placeholder="請輸入標題" v-model="tempCoupon.title" required />
             </div>
             <div class="form-group">
               <label for="code">優惠碼</label>
-              <input
-                type="text"
-                id="code"
-                class="form-control"
-                placeholder="請輸入優惠碼"
-                v-model="tempCoupon.code"
-                required
-              />
+              <input type="text" id="code" class="form-control"  placeholder="請輸入優惠碼" v-model="tempCoupon.code" required />
             </div>
             <div class="form-group">
               <label for="time">到期時間</label>
-              <input
-                type="datetime-local"
-                id="time"
-                class="form-control"
-                placeholder="請輸入到期時間"
-                v-model="deadline.time"
-                :min="deadline.min"
-                required
-              />
+              <input type="datetime-local" id="time" class="form-control" placeholder="請輸入到期時間" v-model="deadline.time" :min="deadline.min" required />
             </div>
             <div class="form-group">
               <label for="percent">折扣百分比</label>
-              <input
-                type="text"
-                id="cpercent"
-                class="form-control"
-                placeholder="請輸入折扣百分比"
-                v-model="tempCoupon.percent"
-                required
-              />
+              <input type="text" id="cpercent" class="form-control" placeholder="請輸入折扣百分比" v-model="tempCoupon.percent" required />
             </div>
             <div class="form-group form-check">
-              <input
-                type="checkbox"
-                class="form-check-input"
-                id="enabled"
-                v-model="tempCoupon.enabled"
-                :true-value="true"
-                :false-value="false"
-              />
+              <input type="checkbox" class="form-check-input" id="enabled" v-model="tempCoupon.enabled" :true-value="true" :false-value="false" />
               <label class="form-check-label" for="enabled">是否啟用</label>
             </div>
           </div>
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-muted"
-              data-dismiss="modal"
-            >
+            <button type="button" class="btn btn-muted" data-dismiss="modal" >
               取消
             </button>
-            <button
-              type="submit"
-              class="btn btn-dark"
-              @click.prevent="updateCoupon()"
-            >
+            <button type="submit" class="btn btn-dark" @click.prevent="updateCoupon()">
               確認
             </button>
           </div>
         </div>
       </div>
     </div>
-
     <!-- delModal -->
-    <div
-      class="modal fade"
-      id="delModal"
-      role="dialog"
-      aria-labelledby="delModalTitle"
-      aria-hidden="true"
-    >
+    <div class="modal fade" id="delModal" role="dialog" aria-labelledby="delModalTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header bg-danger text-light">
             <h5 class="modal-title" id="delModalTitle">刪除優惠劵</h5>
-            <button
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
+            <button  type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">確定要刪除此優惠劵 (刪除後無法復原)</div>
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-outline-dark"
-              data-dismiss="modal"
-            >
+            <button  type="button" class="btn btn-outline-dark" data-dismiss="modal">
               取消
             </button>
-            <button
-              type="button"
-              class="btn btn-outline-danger"
-              @click.prevent="delCoupon()"
-            >
+            <button type="button" class="btn btn-outline-danger" @click.prevent="delCoupon()">
               刪除
             </button>
           </div>
         </div>
       </div>
     </div>
-
     <Pagination :pages="pagination" @get-data="getCoupons" />
   </div>
 </template>
@@ -219,7 +128,6 @@ export default {
   name: 'CouponsManage',
   data () {
     return {
-      isLoading: false,
       pagination: {},
       coupons: {},
       tempCoupon: {
@@ -240,11 +148,11 @@ export default {
     getCoupons (page = 1) {
       const vm = this
       const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/admin/ec/coupons?page=${page}`
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       vm.$http.get(url).then((res) => {
         vm.coupons = res.data.data
         vm.pagination = res.data.meta.pagination
-        vm.isLoading = false
+        vm.$store.dispatch('updateLoading', false, { root: true })
       })
     },
     openModal (status, item) {
@@ -287,10 +195,10 @@ export default {
         status = '更新'
         url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/admin/ec/coupon/${vm.tempCoupon.id}`
       }
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       vm.$http[method](url, vm.tempCoupon)
         .then(() => {
-          vm.isLoading = false
+          vm.$store.dispatch('updateLoading', false, { root: true })
           vm.getCoupons()
           const msg = {
             icon: 'success',
@@ -299,7 +207,7 @@ export default {
           vm.$bus.$emit('alertmessage', msg)
         })
         .catch(() => {
-          vm.isLoading = false
+          vm.$store.dispatch('updateLoading', false, { root: true })
           const msg = {
             icon: 'error',
             title: `${status}優惠劵失敗`
@@ -311,11 +219,11 @@ export default {
     delCoupon () {
       const vm = this
       const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/admin/ec/coupon/${vm.tempCoupon.id}`
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       vm.$http
         .delete(url)
         .then(() => {
-          vm.isLoading = false
+          vm.$store.dispatch('updateLoading', false, { root: true })
           vm.getCoupons()
           const msg = {
             icon: 'success',
@@ -324,7 +232,7 @@ export default {
           vm.$bus.$emit('alertmessage', msg)
         })
         .catch(() => {
-          vm.isLoading = false
+          vm.$store.dispatch('updateLoading', true, { root: true })
           const msg = {
             icon: 'error',
             title: '刪除優惠劵失敗'

@@ -1,27 +1,17 @@
 <template>
   <div class="home">
-    <loading :active.sync="isLoading" :is-full-page="true"></loading>
-
     <div class="banner" id="banner">
       <div class="banner-content">
-        <!-- <h2 class="banner-title">Antique</h2> -->
-        <p class="banner-text">讓古董融入每天的生活，既是環保，更是一種日常的浪漫。
-        </p>
+        <p class="banner-text">讓古董融入每天的生活，既是環保，更是一種日常的浪漫。</p>
         <router-link to="/products" class="btn btn-secondary btn-lg border">
           立即選購
           <span class="ml-3">
             <i class="fas fa-store fa-lg"></i>
           </span>
         </router-link>
-
       </div>
-      <a
-        href="#banner"
-        @click.prevent="scrollDown()"
-        class="scrolldown-btn"
-      ></a>
+      <a href="#banner" @click.prevent="scrollDown()" class="scrolldown-btn" ></a>
     </div>
-
     <div class="feature">
       <div class="feature-info">
         <h2 class="feature-title">風格選物</h2>
@@ -30,22 +20,13 @@
         </p>
       </div>
       <ul class="feature-img">
-        <li
-          class="feature-img1"
-          data-aos="zoom-in"
-          data-aos-duration="3000"
-        ></li>
-        <li
-          class="feature-img2"
-          data-aos="zoom-in"
-          data-aos-duration="3000"
-        ></li>
+        <li class="feature-img1" data-aos="zoom-in" data-aos-duration="3000"></li>
+        <li class="feature-img2" data-aos="zoom-in" data-aos-duration="3000"></li>
       </ul>
     </div>
     <div class="intro">
       <div class="intro-item intro-img1">
-        <router-link class="intro-content"
-          :to="{ name: 'Products', query: { categoryName: '家具商品' }}">
+        <router-link class="intro-content" :to="{ name: 'Products', query: { categoryName: '家具商品' }}">
           <h4 class="intro-title">家具商品</h4>
           <p class="intro-text">歷久彌新經典設計家具，在日常中實踐簡單又美好體驗。</p>
         </router-link>
@@ -58,8 +39,7 @@
         </router-link>
       </div>
       <div class="intro-item intro-img3">
-        <router-link class="intro-content"
-          :to="{ name: 'Products', query: { categoryName: '底片相機' }}">
+        <router-link class="intro-content" :to="{ name: 'Products', query: { categoryName: '底片相機' }}">
           <h4 class="intro-title">底片相機</h4>
           <p class="intro-text">底片的溫度無法被數位相機無法取代，找回攝影最初的感動。</p>
         </router-link>
@@ -67,16 +47,8 @@
     </div>
     <div class="feature">
       <ul class="feature-img">
-        <li
-          class="feature-img3"
-          data-aos="zoom-in"
-          data-aos-duration="3000"
-        ></li>
-        <li
-          class="feature-img4"
-          data-aos="zoom-in"
-          data-aos-duration="3000"
-        ></li>
+        <li class="feature-img3" data-aos="zoom-in" data-aos-duration="3000"></li>
+        <li class="feature-img4" data-aos="zoom-in" data-aos-duration="3000"></li>
       </ul>
       <div class="feature-info">
         <h2 class="feature-title">陳設美學</h2>
@@ -85,11 +57,9 @@
         </p>
       </div>
     </div>
-
     <div class="cover">
       <h3 class="logo">Antique</h3>
     </div>
-
     <div class="feature">
       <div class="feature-info">
         <h2 class="feature-title">顧客回饋</h2>
@@ -112,15 +82,9 @@
               <p class="feature-text">{{ feedback.message }}</p>
             </div>
           </swiper-slide>
-          <div
-            class="swiper-button-prev swiper-button-custom"
-            slot="button-prev"
-          ></div>
-          <div
-            class="swiper-button-next swiper-button-custom"
-            slot="button-next"
-          ></div>
-        </swiper>
+          <div class="swiper-button-prev swiper-button-custom" slot="button-prev"></div>
+          <div class="swiper-button-next swiper-button-custom" slot="button-next"></div>
+       </swiper>
       </div>
     </div>
 
@@ -146,7 +110,6 @@ export default {
   name: 'Home',
   data () {
     return {
-      isLoading: false,
       swiperOption: {
         slidesPerView: 1,
         spaceBetween: 30,

@@ -1,10 +1,7 @@
 <template>
   <div>
-    <loading :active.sync="isLoading" :is-full-page="true"></loading>
-
     <div class="pagebanner pagebanner-img">
     </div>
-
     <div class="brand">
       <div class="brand-about">
         <div  data-aos="zoom-in" data-aos-duration="1000">
@@ -32,7 +29,6 @@ export default {
   name: 'About',
   data () {
     return {
-      isLoading: false
     }
   }
 }

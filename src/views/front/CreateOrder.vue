@@ -1,18 +1,14 @@
 <template>
   <div>
-    <loading :active.sync="isLoading" :is-full-page="true"></loading>
-
     <div class="pagebanner pagebanner-img">
     </div>
-
     <div class="container checkorder">
       <ul class="step">
         <li class="step-item active" :class="{'step-active': step === 1 }">
           <span class="d-block">STEP 1</span>
           確認購物清單
         </li>
-        <li class="step-item"
-        :class="{'active': step === 2 || step === 3, 'step-active': step === 2 }">
+        <li class="step-item" :class="{'active': step === 2 || step === 3, 'step-active': step === 2 }">
           <span class="d-block">STEP 2</span>
           填寫訂購資料
         </li>
@@ -21,10 +17,8 @@
           付款/完成訂單
         </li>
       </ul>
-
       <!-- step 1 -->
       <div v-if="step === 1">
-
         <table class="table table-borderless checkorder-table">
           <thead>
             <tr class="bg-dark text-light">
@@ -39,8 +33,7 @@
           <tbody>
             <tr class="border-bottom" v-for="cart in carts" :key="cart.product.id">
               <td class="d-none d-md-table-cell text-center">
-                <span class="thumbnail"
-                :style="{backgroundImage: 'url(' + cart.product.imageUrl[0] + ')'}">
+                <span class="thumbnail" :style="{backgroundImage: 'url(' + cart.product.imageUrl[0] + ')'}">
                 </span>
               </td>
               <td class="align-middle">
@@ -48,23 +41,11 @@
               </td>
               <td class="d-none d-sm-table-cell align-middle text-center">
                 <div class="counter">
-                  <a href="#" class="lessNum"
-                   @click.prevent="
-                   updateQuantity(cart.product.id, cart.quantity - 1, $event)"
-                  >
+                  <a href="#" class="lessNum" @click.prevent=" updateQuantity(cart.product.id, cart.quantity - 1, $event)">
                     <i class="fas fa-minus"></i>
                   </a>
-                  <input type="number" min="1" max="9999" class="counter-input"
-                    :value="cart.quantity"
-                    @keyup.enter="
-                    updateQuantity(cart.product.id, $event.target.value, $event)"
-                    @change="
-                    updateQuantity(cart.product.id, $event.target.value, $event)"
-                  >
-                  <a href="#" class="addNum"
-                   @click.prevent="
-                   updateQuantity(cart.product.id, cart.quantity + 1, $event)"
-                  >
+                  <input type="number" min="1" max="9999" class="counter-input" :value="cart.quantity" @keyup.enter="updateQuantity(cart.product.id, $event.target.value, $event)" @change="updateQuantity(cart.product.id, $event.target.value, $event)">
+                  <a href="#" class="addNum" @click.prevent="updateQuantity(cart.product.id, cart.quantity + 1, $event)">
                     <i class="fas fa-plus"></i>
                   </a>
                 </div>
@@ -117,7 +98,6 @@
             </tr>
           </tfoot>
         </table>
-
         <div v-show="!cartNum" class="text-center">
           <h4 class="h5 mb-4 text-muted">購物車內無商品</h4>
           <router-link to="/products" class="btn btn-secondary btn-lg py-2">
@@ -127,7 +107,6 @@
             立即購物去
           </router-link>
         </div>
-
         <div class="input-group mb-4 mb-xl-5" v-show="cartNum">
           <input type="text" class="form-control" placeholder="請輸入折價券代碼" v-model.trim="couponInput">
           <div class="input-group-append">
@@ -136,7 +115,6 @@
             </button>
           </div>
         </div>
-
         <div class="checkorder-btngroup" v-show="cartNum">
           <router-link to="/products" class="btn btn-muted btn-lg mb-3 mb-md-0">
             <span class="mr-1">
@@ -152,9 +130,7 @@
             </span>
           </button>
         </div>
-
       </div>
-
        <!-- step 2 -->
       <div v-if="step === 2">
 
@@ -202,12 +178,9 @@
             </tr>
           </tfoot>
         </table>
-
         <h2 class="checkorder-title">訂購資料</h2>
-
         <ValidationObserver v-slot="{ invalid }" tag="form"
          @submit.prevent="createOrder()">
-
           <div class="bg-light  mb-3 mb-md-5 p-4">
             <div class="form-row">
               <ValidationProvider class="form-group col-md-6" name="收件人姓名"
@@ -220,7 +193,6 @@
                   :class="classes" v-model="orderData.name" required>
                   <span class="invalid-feedback">{{ errors[0] }}</span>
               </ValidationProvider>
-
               <ValidationProvider class="form-group col-md-6" name="收件人電話"
                rules="required" tag="div" v-slot="{ errors, classes }">
                   <label for="tel">
@@ -232,7 +204,6 @@
                   <span class="invalid-feedback">{{ errors[0] }}</span>
               </ValidationProvider>
             </div>
-
             <ValidationProvider class="form-group" name="電子郵件" rules="required|email" tag="div"
              v-slot="{ errors, classes }">
               <label for="email">
@@ -243,7 +214,6 @@
               :class="classes" v-model="orderData.email" required>
               <span class="invalid-feedback">{{ errors[0] }}</span>
             </ValidationProvider>
-
             <ValidationProvider class="form-group" name="收件地址" rules="required" tag="div"
              v-slot="{ errors, classes }">
               <label for="address">
@@ -254,7 +224,6 @@
               :class="classes" v-model="orderData.address" required>
               <span class="invalid-feedback">{{ errors[0] }}</span>
             </ValidationProvider>
-
             <ValidationProvider class="form-group" name="支付方式" rules="required" tag="div"
              v-slot="{ errors, classes }">
               <label for="payment">
@@ -274,7 +243,6 @@
               </select>
               <span class="invalid-feedback">{{ errors[0] }}</span>
             </ValidationProvider>
-
             <div class="form-group">
               <label for="message">備註：</label>
               <textarea class="form-control" id="message" rows="3" placeholder="留言給我們"
@@ -282,7 +250,6 @@
               ></textarea>
             </div>
           </div>
-
           <div class="checkorder-btngroup">
             <button type="submut" class="btn btn-muted btn-lg mb-3 mb-md-0"
              @click.prevent="step = 1">
@@ -299,9 +266,7 @@
             </button>
           </div>
         </ValidationObserver>
-
       </div>
-
     </div>
   </div>
 </template>
@@ -311,7 +276,6 @@ export default {
   name: 'CreateOrder',
   data () {
     return {
-      isLoading: false,
       step: 1,
       couponInput: '',
       coupon: {},
@@ -345,10 +309,9 @@ export default {
           product: id,
           quantity: num
         }
-        vm.isLoading = true
-
+        vm.$store.dispatch('updateLoading', true, { root: true })
         vm.$http.patch(url, data).then(() => {
-          vm.isLoading = false
+          vm.$store.dispatch('updateLoading', false, { root: true })
           vm.$emit('get-carts')
           vm.getCarts()
           const msg = {
@@ -357,7 +320,7 @@ export default {
           }
           vm.$bus.$emit('alertmessage', msg)
         }).catch(() => {
-          vm.isLoading = false
+          vm.$store.dispatch('updateLoading', false, { root: true })
           const msg = {
             icon: 'error',
             title: '更新購物車失敗'
@@ -369,7 +332,7 @@ export default {
     getCarts () {
       const vm = this
       const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/shopping`
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       let num = 0
       let total = 0
       vm.$http.get(url).then((res) => {
@@ -381,42 +344,41 @@ export default {
         })
         vm.cartNum = num
         vm.totalMoney = total
-        vm.isLoading = false
+        vm.$store.dispatch('updateLoading', false, { root: true })
       })
     },
     delCartItem (id) {
       const vm = this
       const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/shopping/${id}`
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       vm.$http.delete(url, { product: id }).then(() => {
+        vm.$store.dispatch('updateLoading', false, { root: true })
         const msg = {
           icon: 'success',
           title: '已刪除此筆資料'
         }
-        vm.isLoading = false
         vm.$bus.$emit('alertmessage', msg)
 
         vm.$emit('get-carts')
         vm.getCarts()
       }).catch(() => {
+        vm.$store.dispatch('updateLoading', false, { root: true })
         const msg = {
           icon: 'error',
           title: '刪除購物車失敗'
         }
         vm.$bus.$emit('alertmessage', msg)
-
-        vm.isLoading = false
       })
     },
     getCoupon () {
       const vm = this
       const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/coupon/search`
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       vm.coupon = {}
       vm.orderData.coupon = ''
 
       if (!vm.couponInput) {
-        vm.isLoading = false
+        vm.$store.dispatch('updateLoading', false, { root: true })
         const msg = {
           title: '錯誤',
           text: '請輸入折價劵代碼',
@@ -429,29 +391,28 @@ export default {
       vm.$http.post(url, { code: vm.couponInput }).then((res) => {
         vm.coupon = res.data.data
         vm.orderData.coupon = res.data.data.code
+        vm.$store.dispatch('updateLoading', false, { root: true })
         const msg = {
           icon: 'success',
           title: '已成功使用此 Coupon 券'
         }
         vm.$bus.$emit('alertmessage', msg)
-
         vm.couponInput = ''
-        vm.isLoading = false
       }).catch(() => {
+        vm.$store.dispatch('updateLoading', false, { root: true })
         const msg = {
           icon: 'error',
           title: '出錯了~ 此 Coupon 券無效'
         }
         vm.$bus.$emit('alertmessage', msg)
-        vm.isLoading = false
       })
     },
     createOrder () {
       const vm = this
       const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/orders`
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       vm.$http.post(url, vm.orderData).then((res) => {
-        vm.isLoading = false
+        vm.$store.dispatch('updateLoading', false, { root: true })
         const { id } = res.data.data
         vm.$emit('get-carts')
         vm.$swal({
@@ -468,14 +429,13 @@ export default {
           vm.$router.push({ name: 'Order', params: { orderId: id } })
         })
       }).catch(() => {
+        vm.$store.dispatch('updateLoading', false, { root: true })
         const msg = {
           title: '錯誤',
           text: '出錯了~ 請重新訂購',
           status: 'danger'
         }
         vm.$bus.$emit('alertmessage', msg, 'modal')
-
-        vm.isLoading = false
       })
     }
   },

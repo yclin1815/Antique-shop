@@ -37,7 +37,7 @@
                       <router-link :to="`/products/${favorite.id}`" class="favorite-link">
                         <span class="toolbar-thumbnail mr-3"
                         :style="{backgroundImage: 'url(' + favorite.imageUrl + ')'}">
-                        ></span>
+                        </span>
                         <p class="mb-1">{{ favorite.title }}</p>
                       </router-link>
                     </td>
@@ -125,12 +125,12 @@
 
 <script>
 /* global $ */
+import { mapGetters } from 'vuex'
 import AlertMessage from '../components/AlertMessage.vue'
 export default {
   name: 'Layout',
   data () {
     return {
-      isLoading: false,
       scrollHeader: false,
       isMenuOpen: false,
       carts: [],
@@ -143,7 +143,7 @@ export default {
     getCarts () {
       const vm = this
       const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/shopping`
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       vm.$http.get(url).then((res) => {
         let num = 0
         vm.carts = res.data.data
@@ -151,15 +151,15 @@ export default {
           num += Number(item.quantity)
         })
         vm.cartsNum = num
-        vm.isLoading = false
+        vm.$store.dispatch('updateLoading', false, { root: true })
       })
     },
     delCartItem (id) {
       const vm = this
       const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/shopping/${id}`
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       vm.$http.delete(url, { product: id }).then(() => {
-        vm.isLoading = false
+        vm.$store.dispatch('updateLoading', false, { root: true })
         const msg = {
           icon: 'success',
           title: '商品已刪除'
@@ -173,7 +173,7 @@ export default {
           vm.$refs.view.getCarts()
         }
       }).catch(() => {
-        vm.isLoading = false
+        vm.$store.dispatch('updateLoading', false, { root: true })
         const msg = {
           icon: 'error',
           title: '刪除購物車失敗'
@@ -261,6 +261,9 @@ export default {
           break
       }
     }
+  },
+  computed: {
+    ...mapGetters(['isLoading'])
   },
   watch: {
     $route (to, from) {

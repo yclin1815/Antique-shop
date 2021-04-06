@@ -1,18 +1,14 @@
 <template>
   <div>
-    <loading :active.sync="isLoading" :is-full-page="true"></loading>
-
     <div class="pagebanner pagebanner-img">
     </div>
-
     <div class="container checkorder">
       <ul class="step">
         <li class="step-item active" :class="{'step-active': step === 1 }">
           <span class="d-block">STEP 1</span>
           確認購物清單
         </li>
-        <li class="step-item"
-        :class="{'active': step === 2 || step === 3, 'step-active': step === 2 }">
+        <li class="step-item" :class="{'active': step === 2 || step === 3, 'step-active': step === 2 }">
           <span class="d-block">STEP 2</span>
           填寫訂購資料
         </li>
@@ -21,7 +17,6 @@
           付款/完成訂單
         </li>
       </ul>
-
       <div v-if="step === 3">
         <h2 class="checkorder-title">訂單清單</h2>
         <div class="table-responsive-md mb-5">
@@ -52,7 +47,6 @@
             </tfoot>
           </table>
         </div>
-
         <h2 class="checkorder-title">訂購資訊</h2>
         <div class="table-responsive-md order-table">
           <table class="table" v-if="order.user">
@@ -87,7 +81,6 @@
             </tr>
           </table>
         </div>
-
         <div class="text-center" v-if="!order.paid">
           <a href="#" class="btn btn-secondary btn-lg" @click.prevent="payOrder(orderId)">
             確認付款
@@ -97,7 +90,6 @@
           </a>
         </div>
       </div>
-
     </div>
   </div>
 </template>
@@ -109,7 +101,6 @@ export default {
   name: 'Order',
   data () {
     return {
-      isLoading: false,
       step: 3,
       orderId: '',
       order: {}
@@ -119,12 +110,12 @@ export default {
     getOrder (id) {
       const vm = this
       const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/orders/${id}`
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       vm.$http.get(url).then((res) => {
         vm.order = res.data.data
-        vm.isLoading = false
+        vm.$store.dispatch('updateLoading', false, { root: true })
       }).catch(() => {
-        vm.isLoading = false
+        vm.$store.dispatch('updateLoading', false, { root: true })
         vm.$swal({
           title: '出錯了',
           text: '糟糕，找不到此訂單，將返回首頁',
@@ -142,9 +133,9 @@ export default {
     payOrder (id) {
       const vm = this
       const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/orders/${id}/paying`
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       vm.$http.post(url).then(() => {
-        vm.isLoading = false
+        vm.$store.dispatch('updateLoading', false, { root: true })
         vm.getOrder(id)
         vm.$swal({
           title: '付款成功',
@@ -161,12 +152,12 @@ export default {
           vm.$router.push('/')
         })
       }).catch(() => {
+        vm.$store.dispatch('updateLoading', false, { root: true })
         const msg = {
           icon: 'error',
           title: '付款失敗'
         }
         vm.$bus.$emit('alertmessage', msg)
-        vm.isLoading = false
       })
     }
   },

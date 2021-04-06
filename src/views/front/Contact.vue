@@ -1,10 +1,7 @@
 <template>
   <div>
-    <loading :active.sync="isLoading" :is-full-page="true"></loading>
-
     <div class="pagebanner pagebanner-img">
     </div>
-
     <div class="contact">
       <div class="contact-info" data-aos="zoom-in" data-aos-duration="1000">
         <h2 class="contact-title">
@@ -17,22 +14,17 @@
           星號 * 為必填欄位
         </p>
       </div>
-      <ValidationObserver class="contact-form" v-slot="{ invalid }" tag="form"
-        @submit.prevent="sendMessage()">
-
-        <ValidationProvider class="form-group row" name="姓名" rules="required" tag="div"
-          v-slot="{ errors, classes }">
+      <ValidationObserver class="contact-form" v-slot="{ invalid }" tag="form" @submit.prevent="sendMessage()">
+        <ValidationProvider class="form-group row" name="姓名" rules="required" tag="div" v-slot="{ errors, classes }">
           <label for="name" class="col-sm-2 col-form-label">
             <span class="text-danger">*</span>
             姓名
           </label>
           <div class="col-sm-10">
-            <input type="text" id="name" class="form-control" placeholder="請輸入姓名"
-              :class="classes" v-model="tempData.name" required>
+            <input type="text" id="name" class="form-control" placeholder="請輸入姓名" :class="classes" v-model="tempData.name" required>
             <span class="invalid-feedback">{{ errors[0] }}</span>
           </div>
         </ValidationProvider>
-
         <ValidationProvider class="form-group row" name="電話" rules="required" tag="div"
           v-slot="{ errors, classes }">
           <label for="tel" class="col-sm-2 col-form-label">
@@ -40,44 +32,35 @@
             電話
           </label>
           <div class="col-sm-10">
-            <input type="text" id="tel" class="form-control" placeholder="請輸入電話"
-              :class="classes" v-model="tempData.tel" required>
+            <input type="text" id="tel" class="form-control" placeholder="請輸入電話" :class="classes" v-model="tempData.tel" required>
             <span class="invalid-feedback">{{ errors[0] }}</span>
           </div>
         </ValidationProvider>
-
-        <ValidationProvider class="form-group row" name="電子郵件" rules="required|email" tag="div"
-          v-slot="{ errors, classes }">
+        <ValidationProvider class="form-group row" name="電子郵件" rules="required|email" tag="div" v-slot="{ errors, classes }">
           <label for="email" class="col-sm-2 col-form-label">
             <span class="text-danger">*</span>
             電子郵件
           </label>
           <div class="col-sm-10">
-            <input type="email" id="email" class="form-control" placeholder="請輸入電子郵件"
-              :class="classes" v-model="tempData.email" required>
+            <input type="email" id="email" class="form-control" placeholder="請輸入電子郵件" :class="classes" v-model="tempData.email" required>
             <span class="invalid-feedback">{{ errors[0] }}</span>
           </div>
         </ValidationProvider>
-
-        <ValidationProvider class="form-group row" name="留言" rules="required" tag="div"
-          v-slot="{ errors, classes }">
+        <ValidationProvider class="form-group row" name="留言" rules="required" tag="div" v-slot="{ errors, classes }">
           <label for="message" class="col-sm-2 col-form-label">
             <span class="text-danger">*</span>
             留言
           </label>
           <div class="col-sm-10">
-            <textarea class="form-control" id="message" rows="3" placeholder="留言給我們"
-              :class="classes" v-model="tempData.message" required></textarea>
+            <textarea class="form-control" id="message" rows="3" placeholder="留言給我們" :class="classes" v-model="tempData.message" required></textarea>
             <span class="invalid-feedback">{{ errors[0] }}</span>
           </div>
         </ValidationProvider>
-
         <div class="text-center">
           <button type="submit" class="btn btn-dark btn-lg" :disabled="invalid">送出</button>
         </div>
       </ValidationObserver>
     </div>
-
     <div class="contact">
       <div class="contact-map">
         <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3640.7638693303306!2d120.6604659649888!3d24.144929384396363!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x34693da1ca018bd3%3A0xdf6594a4c18d0e9f!2z5a-p6KiIMzY45paw5Ym16IGa6JC9!5e0!3m2!1szh-TW!2stw!4v1617547471591!5m2!1szh-TW!2stw" frameborder="0" style="border: 0" allowfullscreen="" aria-hidden="false" tabindex="0">
@@ -138,7 +121,6 @@ export default {
   name: 'About',
   data () {
     return {
-      isLoading: false,
       tempData: {
         name: '',
         email: '',

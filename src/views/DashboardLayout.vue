@@ -1,27 +1,16 @@
 <template>
   <div>
     <AlertMessage />
-
     <loading :active.sync="isLoading" :is-full-page="true"></loading>
-
     <nav class="navbar sticky-top navbar-dark bg-dark">
       <router-link to="/" class="navbar-brand logo">Adagio</router-link>
       <div class="navbar-nav ml-auto d-none d-md-flex">
         <a href="#" class="nav-link" @click.prevent="logout()">登出</a>
       </div>
-      <button
-        class="navbar-toggler d-md-none"
-        type="button"
-        data-toggle="collapse"
-        data-target="#sidebar"
-        aria-controls="sidebar"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
+      <button class="navbar-toggler d-md-none" type="button" data-toggle="collapse" data-target="#sidebar" aria-controls="sidebar" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
     </nav>
-
     <div class="container-fluid">
       <div class="row">
         <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block collapse sidebar">
@@ -52,7 +41,6 @@
               </router-link>
             </li>
           </ul>
-
           <h6 class="sidebar-subtitle">電商首頁</h6>
           <ul class="nav flex-column">
             <li class="nav-item">
@@ -63,7 +51,6 @@
             </li>
           </ul>
         </nav>
-
         <main class="col-md-9 col-lg-10 p-4">
           <router-view v-if="checkSuccess"/>
         </main>
@@ -74,12 +61,12 @@
 
 <script>
 import AlertMessage from '../components/AlertMessage.vue'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'DashboardLayout',
   data () {
     return {
-      isLoading: false,
       token: '',
       checkSuccess: false
     }
@@ -91,7 +78,7 @@ export default {
         /(?:(?:^|.*;\s*)hexToken\s*=\s*([^;]*).*$)|^.*$/,
         '$1'
       )
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       vm.$http({
         method: 'post',
         url: `${process.env.VUE_APP_APIPATH}/auth/logout`,
@@ -103,8 +90,7 @@ export default {
         // 清空 cookie
         document.cookie = 'hexToken=;expires=;path=/'
         vm.checkSuccess = false
-        vm.isLoading = false
-
+        vm.$store.dispatch('updateLoading', false, { root: true })
         const msg = {
           icon: 'success',
           title: '登出成功'
@@ -121,8 +107,7 @@ export default {
         /(?:(?:^|.*;\s*)hexToken\s*=\s*([^;]*).*$)|^.*$/,
         '$1'
       )
-      vm.isLoading = true
-
+      vm.$store.dispatch('updateLoading', true, { root: true })
       vm.$http.post(url, { api_token: vm.token }).then((res) => {
         if (!res.data.success) {
           const msg = {
@@ -132,12 +117,14 @@ export default {
           vm.$bus.$emit('alertmessage', msg)
           vm.$router.push('/login')
         }
-
         vm.checkSuccess = true
         vm.$http.defaults.headers.common.Authorization = `Bearer ${vm.token}`
-        vm.isLoading = false
+        vm.$store.dispatch('updateLoading', false, { root: true })
       })
     }
+  },
+  computed: {
+    ...mapGetters(['isLoading'])
   },
   components: {
     AlertMessage

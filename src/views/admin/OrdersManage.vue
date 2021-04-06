@@ -1,7 +1,5 @@
 <template>
   <div>
-    <loading :active.sync="isLoading" :is-full-page="true"></loading>
-
     <div class="table-responsive">
       <table class="table">
         <thead>
@@ -14,18 +12,10 @@
           </tr>
         </thead>
         <tbody v-if="orders.length">
-          <tr
-            v-for="item in orders"
-            :key="item.id"
-            :class="{ 'table-success': item.paid }"
-          >
+          <tr v-for="item in orders" :key="item.id" :class="{ 'table-success': item.paid }">
             <td>{{ item.created.datetime }}</td>
             <td class="d-none d-md-table-cell">
-              <ul
-                class="mb-0 list-unstyled"
-                v-for="(product, key) in item.products"
-                :key="key"
-              >
+              <ul class="mb-0 list-unstyled" v-for="(product, key) in item.products" :key="key">
                 <li>
                   {{ product.product.title }} ： {{ product.quantity }}
                   {{ product.product.unit }}
@@ -38,13 +28,7 @@
             <td class="text-right">{{ item.amount | currency }}</td>
             <td class="d-none d-lg-table-cell">
               <div class="custom-control custom-switch">
-                <input
-                  type="checkbox"
-                  class="custom-control-input active"
-                  :id="item.id"
-                  v-model="item.paid"
-                  @change.prevent="setOrderPaid(item)"
-                />
+                <input type="checkbox" class="custom-control-input active" :id="item.id" v-model="item.paid" @change.prevent="setOrderPaid(item)"/>
                 <label class="custom-control-label" :for="item.id"></label>
                 <span class="text-success" v-if="item.paid">已付款</span>
                 <span class="text-muted" v-else>未付款</span>
@@ -54,7 +38,6 @@
         </tbody>
       </table>
     </div>
-
     <Pagination :pages="pagination" @get-data="getOrders" />
   </div>
 </template>
@@ -66,7 +49,6 @@ export default {
   name: 'OrdersManage',
   data () {
     return {
-      isLoading: false,
       pagination: {},
       orders: {}
     }
@@ -75,12 +57,12 @@ export default {
     getOrders (page = 1) {
       const vm = this
       const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/admin/ec/orders?page=${page}`
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       vm.$http.get(url).then((res) => {
-        vm.isLoading = false
+        vm.$store.dispatch('updateLoading', false, { root: true })
         vm.orders = res.data.data
         vm.pagination = res.data.meta.pagination
-        vm.isLoading = false
+        vm.$store.dispatch('updateLoading', false, { root: true })
       })
     },
     setOrderPaid (item) {
@@ -90,7 +72,7 @@ export default {
       if (!item.paid) {
         url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/admin/ec/orders/${item.id}/unpaid`
       }
-      vm.isLoading = true
+      vm.$store.dispatch('updateLoading', true, { root: true })
       vm.$http
         .patch(url, item.id)
         .then(() => {
@@ -102,7 +84,7 @@ export default {
           vm.$bus.$emit('alertmessage', msg)
         })
         .catch(() => {
-          vm.isLoading = false
+          vm.$store.dispatch('updateLoading', false, { root: true })
           const msg = {
             icon: 'error',
             title: '更新失敗'
