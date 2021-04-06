@@ -41,11 +41,12 @@
               </td>
               <td class="d-none d-sm-table-cell align-middle text-center">
                 <div class="counter">
-                  <a href="#" class="lessNum" @click.prevent=" updateQuantity(cart.product.id, cart.quantity - 1, $event)">
+                  <a href="#" class="lessNum" @click.prevent=" updateCartItem(cart.product.id, cart.quantity - 1, $event)">
                     <i class="fas fa-minus"></i>
                   </a>
-                  <input type="number" min="1" max="9999" class="counter-input" :value="cart.quantity" @keyup.enter="updateQuantity(cart.product.id, $event.target.value, $event)" @change="updateQuantity(cart.product.id, $event.target.value, $event)">
-                  <a href="#" class="addNum" @click.prevent="updateQuantity(cart.product.id, cart.quantity + 1, $event)">
+                  <input type="number" min="1" readonly="readonly"
+                   :value="cart.quantity" class="counter-input">
+                  <a href="#" class="addNum" @click.prevent="updateCartItem(cart.product.id, cart.quantity + 1, $event)">
                     <i class="fas fa-plus"></i>
                   </a>
                 </div>
@@ -272,6 +273,7 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex'
 export default {
   name: 'CreateOrder',
   data () {
@@ -279,9 +281,6 @@ export default {
       step: 1,
       couponInput: '',
       coupon: {},
-      carts: {},
-      cartNum: 0,
-      totalMoney: 0,
       isCreateOrderAllow: true,
       orderData: {
         name: '',
@@ -295,80 +294,19 @@ export default {
     }
   },
   methods: {
-    updateQuantity (id, num) {
-      const vm = this
-      const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/shopping`
+    updateCartItem (id, num) {
       if (num <= 0) {
         const msg = {
           icon: 'error',
-          title: '商品數量必須大於 1 樣'
+          title: '商品數量不可小於 1'
         }
-        vm.$store.dispatch('alertMessageModules/openToast', msg)
+        this.$store.dispatch('alertMessageModules/openToast', msg)
       } else {
-        const data = {
-          product: id,
-          quantity: num
-        }
-        vm.$store.dispatch('updateLoading', true, { root: true })
-        vm.$http.patch(url, data).then(() => {
-          vm.$store.dispatch('updateLoading', false, { root: true })
-          vm.$emit('get-carts')
-          vm.getCarts()
-          const msg = {
-            icon: 'success',
-            title: '更新購物車成功'
-          }
-          vm.$store.dispatch('alertMessageModules/openToast', msg)
-        }).catch(() => {
-          vm.$store.dispatch('updateLoading', false, { root: true })
-          const msg = {
-            icon: 'error',
-            title: '更新購物車失敗'
-          }
-          vm.$store.dispatch('alertMessageModules/openToast', msg)
-        })
+        this.$store.dispatch('cartModules/updateCartItem', { id, num, method: 'set' })
       }
     },
-    getCarts () {
-      const vm = this
-      const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/shopping`
-      vm.$store.dispatch('updateLoading', true, { root: true })
-      let num = 0
-      let total = 0
-      vm.$http.get(url).then((res) => {
-        vm.carts = res.data.data
-        vm.carts.forEach((item) => {
-          num += Number(item.quantity)
-          const price = item.product.price * item.quantity
-          total += price
-        })
-        vm.cartNum = num
-        vm.totalMoney = total
-        vm.$store.dispatch('updateLoading', false, { root: true })
-      })
-    },
     delCartItem (id) {
-      const vm = this
-      const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/shopping/${id}`
-      vm.$store.dispatch('updateLoading', true, { root: true })
-      vm.$http.delete(url, { product: id }).then(() => {
-        vm.$store.dispatch('updateLoading', false, { root: true })
-        const msg = {
-          icon: 'success',
-          title: '已刪除此筆資料'
-        }
-        vm.$store.dispatch('alertMessageModules/openToast', msg)
-
-        vm.$emit('get-carts')
-        vm.getCarts()
-      }).catch(() => {
-        vm.$store.dispatch('updateLoading', false, { root: true })
-        const msg = {
-          icon: 'error',
-          title: '刪除購物車失敗'
-        }
-        vm.$store.dispatch('alertMessageModules/openToast', msg)
-      })
+      this.$store.dispatch('cartModules/delCartItem', id)
     },
     getCoupon () {
       const vm = this
@@ -437,10 +375,14 @@ export default {
         }
         vm.$store.dispatch('alertMessageModules/openModal', msg)
       })
-    }
+    },
+    ...mapActions('cartModules', ['getCarts'])
+  },
+  computed: {
+    ...mapGetters('cartModules', ['carts', 'cartNum', 'totalMoney'])
   },
   created () {
-    this.getCarts()
+    this.$store.dispatch('cartModules/getCarts')
   }
 }
 </script>

@@ -84,6 +84,7 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex'
 import Pagination from '@/components/Pagination.vue'
 import bannerImgAllmenu from '@/assets/images/banner-allmenu.jpg'
 import bannerImgFurniture from '@/assets/images/banner-furniture.jpg'
@@ -104,7 +105,6 @@ export default {
         current_page: 1 // 所在頁面
       },
       products: [],
-      carts: [],
       favorites: {},
       searchText: '',
       filterText: '',
@@ -159,18 +159,8 @@ export default {
         vm.$store.dispatch('updateLoading', false, { root: true })
       })
     },
-    getCarts () {
-      const vm = this
-      const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/shopping`
-      vm.$store.dispatch('updateLoading', true, { root: true })
-      vm.$http.get(url).then((res) => {
-        vm.carts = res.data.data
-        vm.$store.dispatch('updateLoading', false, { root: true })
-      })
-    },
     updateCartItem (id, num) {
       const vm = this
-      const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/shopping`
       let n = 0
       let method = 'post'
       n = Number(num)
@@ -179,30 +169,7 @@ export default {
         method = 'patch'
         n = Number(isInCart[0].quantity) + Number(num)
       }
-      const data = {
-        product: id,
-        quantity: n
-      }
-      vm.$store.dispatch('updateLoading', true, { root: true })
-      vm.$http[method](url, data)
-        .then(() => {
-          vm.getCarts()
-          vm.$emit('get-carts')
-          vm.$store.dispatch('updateLoading', false, { root: true })
-          const msg = {
-            icon: 'success',
-            title: '更新購物車成功'
-          }
-          vm.$store.dispatch('alertMessageModules/openToast', msg)
-        })
-        .catch(() => {
-          vm.$store.dispatch('updateLoading', false, { root: true })
-          const msg = {
-            icon: 'error',
-            title: '更新購物車失敗'
-          }
-          vm.$store.dispatch('alertMessageModules/openToast', msg)
-        })
+      vm.$store.dispatch('cartModules/updateCartItem', { id, num: n, method })
     },
     getFavorites () {
       const vm = this
@@ -297,7 +264,8 @@ export default {
     changePage (currentPage) {
       this.currentPage = currentPage
       this.pagination.current_page = Number(currentPage)
-    }
+    },
+    ...mapActions('cartModules', ['getCarts'])
   },
   computed: {
     filterData () {
@@ -339,7 +307,8 @@ export default {
       newProducts = data
 
       return newProducts
-    }
+    },
+    ...mapGetters('cartModules', ['carts'])
   },
   components: {
     Pagination
@@ -347,7 +316,7 @@ export default {
   created () {
     const vm = this
     vm.getProducts()
-    vm.getCarts()
+    this.$store.dispatch('cartModules/getCarts')
   }
 }
 </script>

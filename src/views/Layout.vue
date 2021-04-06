@@ -63,7 +63,7 @@
           <li class="dropdown">
             <a href="#" class="toolbar-link p-3" role="button" data-toggle="dropdown">
               <i class="fas fa-shopping-bag"></i>
-              <span class="toolbar-num">{{ cartsNum }}</span>
+              <span class="toolbar-num">{{ cartNum }}</span>
             </a>
             <div class="dropdown-menu dropdown-menu-right px-2">
               <h5 class="text-center">購物車清單</h5>
@@ -91,7 +91,7 @@
                 </tbody>
               </table>
 
-              <div v-if="!cartsNum">
+              <div v-if="!cartNum">
                 <p class="mb-2 text-center text-muted">購物車無商品</p>
                 <router-link to="/products" class="btn btn-block btn-dark">購物去</router-link>
               </div>
@@ -112,8 +112,7 @@
         </ul>
       </div>
     </div>
-    <router-view @get-carts="getCarts" @get-favorites="getFavorites" :key="$route.fullPath"
-     ref="view">
+    <router-view @get-favorites="getFavorites" :key="$route.fullPath" ref="view">
     </router-view>
     <div class="footer">
       ⓒ 2021 Antique
@@ -123,60 +122,20 @@
 
 <script>
 /* global $ */
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 export default {
   name: 'Layout',
   data () {
     return {
       scrollHeader: false,
       isMenuOpen: false,
-      carts: [],
-      cartsNum: 0,
       favorites: [],
       favoritesNum: 0
     }
   },
   methods: {
-    getCarts () {
-      const vm = this
-      const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/shopping`
-      vm.$store.dispatch('updateLoading', true, { root: true })
-      vm.$http.get(url).then((res) => {
-        let num = 0
-        vm.carts = res.data.data
-        vm.carts.forEach((item) => {
-          num += Number(item.quantity)
-        })
-        vm.cartsNum = num
-        vm.$store.dispatch('updateLoading', false, { root: true })
-      })
-    },
     delCartItem (id) {
-      const vm = this
-      const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/shopping/${id}`
-      vm.$store.dispatch('updateLoading', true, { root: true })
-      vm.$http.delete(url, { product: id }).then(() => {
-        vm.$store.dispatch('updateLoading', false, { root: true })
-        const msg = {
-          icon: 'success',
-          title: '商品已刪除'
-        }
-        vm.$store.dispatch('alertMessageModules/openToast', msg)
-        vm.getCarts()
-
-        // 若在 checkorder 或 Products 或 Product 頁則重整內頁購物車
-        const routerName = vm.$refs.view.$route.name
-        if (routerName === 'Products' || routerName === 'Product' || routerName === 'CreateOrder') {
-          vm.$refs.view.getCarts()
-        }
-      }).catch(() => {
-        vm.$store.dispatch('updateLoading', false, { root: true })
-        const msg = {
-          icon: 'error',
-          title: '刪除購物車失敗'
-        }
-        vm.$store.dispatch('alertMessageModules/openToast', msg)
-      })
+      this.$store.dispatch('cartModules/delCartItem', id)
     },
     getFavorites () {
       const vm = this
@@ -257,10 +216,12 @@ export default {
           vm.scrollHeader = true
           break
       }
-    }
+    },
+    ...mapActions('cartModules', ['getCarts'])
   },
   computed: {
-    ...mapGetters(['isLoading'])
+    ...mapGetters(['isLoading']),
+    ...mapGetters('cartModules', ['carts', 'cartNum'])
   },
   watch: {
     $route (to, from) {
@@ -273,7 +234,7 @@ export default {
   },
   created () {
     const vm = this
-    vm.getCarts()
+    vm.$store.dispatch('cartModules/getCarts')
     vm.getFavorites()
     vm.scrollPage()
   }

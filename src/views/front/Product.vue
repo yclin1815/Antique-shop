@@ -51,16 +51,16 @@
           </ul>
           <div class="product-cart">
             <div class="counter">
-              <a href="#" class="lessNum" @click.prevent="lessNum()">
+                <a href="#" class="lessNum" @click.prevent="lessNum()">
                 <i class="fas fa-minus"></i>
               </a>
               <input type="number" min="1" readonly="readonly" class="counter-input"
                 v-model="counterNum">
-              <a href="#" class="addNum" @click.prevent="counterNum += 1">
+                <a href="#" class="addNum" @click.prevent="counterNum += 1">
                 <i class="fas fa-plus"></i>
               </a>
             </div>
-            <a href="#" class="btn btn-dark" @click.prevent="updateCartItem(product.id)">
+            <a href="#" class="btn btn-dark" @click.prevent="updateCartItem(product.id, counterNum)">
               <span class="mr-1">
                 <i class="fas fa-cart-plus"></i>
               </span>
@@ -87,6 +87,7 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex'
 import bannerImgAllmenu from '@/assets/images/banner-allmenu.jpg'
 import bannerImgFurniture from '@/assets/images/banner-furniture.jpg'
 import bannerImgDeco from '@/assets/images/banner-deco.jpg'
@@ -103,7 +104,6 @@ export default {
       categoryName: '',
       product: {},
       relatedProducts: [],
-      carts: [],
       favorites: [],
       isFavorite: false,
       counterNum: 1,
@@ -161,10 +161,13 @@ export default {
   },
   methods: {
     lessNum () {
-      if (this.counterNum > 2) {
-        this.counterNum -= 1
-      } else {
-        this.counterNum = 1
+      switch (true) {
+        case this.counterNum > 2:
+          this.counterNum -= 1
+          break
+        default:
+          this.counterNum = 1
+          break
       }
     },
     getRelated (category) {
@@ -208,50 +211,8 @@ export default {
         })
       })
     },
-    getCarts () {
-      const vm = this
-      const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/shopping`
-      vm.$store.dispatch('updateLoading', true, { root: true })
-      vm.$http.get(url).then((res) => {
-        vm.carts = res.data.data
-        vm.$store.dispatch('updateLoading', false, { root: true })
-      })
-    },
-    updateCartItem (id) {
-      const vm = this
-      const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/shopping`
-      let n = 0
-      let method = 'post'
-      n = Number(vm.counterNum)
-      const isInCart = vm.carts.filter((item) => item.product.id === id)
-      if (isInCart.length > 0) {
-        method = 'patch'
-        n = Number(isInCart[0].quantity) + Number(vm.counterNum)
-      }
-      const data = {
-        product: id,
-        quantity: n
-      }
-      vm.$store.dispatch('updateLoading', true, { root: true })
-      vm.$http[method](url, data)
-        .then(() => {
-          vm.getCarts()
-          vm.$emit('get-carts')
-          vm.$store.dispatch('updateLoading', false, { root: true })
-          const msg = {
-            icon: 'success',
-            title: '更新購物車成功'
-          }
-          vm.$store.dispatch('alertMessageModules/openToast', msg)
-        })
-        .catch(() => {
-          vm.$store.dispatch('updateLoading', false, { root: true })
-          const msg = {
-            icon: 'error',
-            title: '更新購物車失敗'
-          }
-          vm.$store.dispatch('alertMessageModules/openToast', msg)
-        })
+    updateCartItem (id, num) {
+      this.$store.dispatch('cartModules/updateCartItem', { id, num, method: 'add' })
     },
     getFavorites () {
       const vm = this
@@ -300,7 +261,11 @@ export default {
 
       vm.$emit('get-favorites')
       vm.getFavorites()
-    }
+    },
+    ...mapActions('cartModules', ['getCarts'])
+  },
+  computed: {
+    ...mapGetters('cartModules', ['carts'])
   },
   components: {
     Swiper,
@@ -310,7 +275,7 @@ export default {
     const id = this.$route.params.productId
     const vm = this
     vm.getProduct(id)
-    vm.getCarts()
+    this.$store.dispatch('cartModules/getCarts')
   }
 }
 </script>

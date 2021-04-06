@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import alertMessageModules from './modules/alertMessage'
+import cartModules from './modules/cart'
 
 Vue.use(Vuex)
 
@@ -24,6 +25,7 @@ export default new Vuex.Store({
     isLoading: (state) => state.isLoading
   },
   modules: {
-    alertMessageModules
+    alertMessageModules,
+    cartModules
   }
 })
