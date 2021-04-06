@@ -331,7 +331,7 @@ export default {
             icon: 'error',
             title: '載入商品失敗'
           }
-          vm.$bus.$emit('alertmessage', msg)
+          vm.$store.dispatch('alertMessageModules/openToast', msg)
         })
     },
     openModal (status, item) {
@@ -376,7 +376,7 @@ export default {
             icon: 'success',
             title: `${status}商品成功`
           }
-          vm.$bus.$emit('alertmessage', msg)
+          vm.$store.dispatch('alertMessageModules/openToast', msg)
         })
         .catch(() => {
           $('#editModal').modal('hide')
@@ -385,7 +385,7 @@ export default {
             icon: 'error',
             title: `${status}商品失敗`
           }
-          vm.$bus.$emit('alertmessage', msg)
+          vm.$store.dispatch('alertMessageModules/openToast', msg)
         })
     },
     delProduct () {
@@ -402,7 +402,7 @@ export default {
             icon: 'success',
             title: '刪除商品成功'
           }
-          vm.$bus.$emit('alertmessage', msg)
+          vm.$store.dispatch('alertMessageModules/openToast', msg)
         })
         .catch(() => {
           vm.$store.dispatch('updateLoading', false, { root: true })
@@ -410,7 +410,7 @@ export default {
             icon: 'error',
             title: '刪除商品失敗'
           }
-          vm.$bus.$emit('alertmessage', msg)
+          vm.$store.dispatch('alertMessageModules/openToast', msg)
         })
       $('#delModal').modal('hide')
     },
@@ -441,7 +441,7 @@ export default {
             icon: 'success',
             title: '上傳圖片成功'
           }
-          vm.$bus.$emit('alertmessage', msg)
+          vm.$store.dispatch('alertMessageModules/openToast', msg)
         })
         .catch(() => {
           vm.$store.dispatch('updateLoading', false, { root: true })
@@ -449,7 +449,7 @@ export default {
             icon: 'error',
             title: '上傳圖片失敗，請確認檔案大小'
           }
-          vm.$bus.$emit('alertmessage', msg)
+          vm.$store.dispatch('alertMessageModules/openToast', msg)
         })
     }
   },

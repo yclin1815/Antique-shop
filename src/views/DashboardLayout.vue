@@ -1,6 +1,5 @@
 <template>
   <div>
-    <AlertMessage />
     <loading :active.sync="isLoading" :is-full-page="true"></loading>
     <nav class="navbar sticky-top navbar-dark bg-dark">
       <router-link to="/" class="navbar-brand logo">Adagio</router-link>
@@ -60,7 +59,6 @@
 </template>
 
 <script>
-import AlertMessage from '../components/AlertMessage.vue'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -95,7 +93,7 @@ export default {
           icon: 'success',
           title: '登出成功'
         }
-        vm.$bus.$emit('alertmessage', msg)
+        vm.$store.dispatch('alertMessageModules/openToast', msg)
 
         vm.$router.push('/login')
       })
@@ -114,7 +112,7 @@ export default {
             icon: 'error',
             title: '出現錯誤'
           }
-          vm.$bus.$emit('alertmessage', msg)
+          vm.$store.dispatch('alertMessageModules/openToast', msg)
           vm.$router.push('/login')
         }
         vm.checkSuccess = true
@@ -125,9 +123,6 @@ export default {
   },
   computed: {
     ...mapGetters(['isLoading'])
-  },
-  components: {
-    AlertMessage
   },
   created () {
     this.checkLogin()

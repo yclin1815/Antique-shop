@@ -117,7 +117,7 @@ export default {
             icon: 'success',
             title: '刪除圖片成功'
           }
-          vm.$bus.$emit('alertmessage', msg)
+          vm.$store.dispatch('alertMessageModules/openToast', msg)
         })
         .catch(() => {
           vm.$store.dispatch('updateLoading', false, { root: true })
@@ -125,7 +125,7 @@ export default {
             icon: 'error',
             title: '刪除圖片失敗'
           }
-          vm.$bus.$emit('alertmessage', msg)
+          vm.$store.dispatch('alertMessageModules/openToast', msg)
         })
       $('#delModal').modal('hide')
     },

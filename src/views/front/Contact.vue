@@ -137,7 +137,7 @@ export default {
         text: '已收到您的留言',
         status: 'success'
       }
-      vm.$bus.$emit('alertmessage', msg, 'modal')
+      vm.$store.dispatch('alertMessageModules/openModal', msg)
     }
   }
 }

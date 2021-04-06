@@ -100,7 +100,7 @@ export default {
             icon: 'success',
             title: '登入成功'
           }
-          vm.$bus.$emit('alertmessage', msg)
+          vm.$store.dispatch('alertMessageModules/openToast', msg)
           vm.$router.push('/admin/productsmanage')
         })
         .catch(() => {
@@ -109,7 +109,7 @@ export default {
             icon: 'error',
             title: '登入失敗'
           }
-          vm.$bus.$emit('alertmessage', msg)
+          vm.$store.dispatch('alertMessageModules/openToast', msg)
         })
     }
   },

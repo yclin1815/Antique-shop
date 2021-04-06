@@ -303,7 +303,7 @@ export default {
           icon: 'error',
           title: '商品數量必須大於 1 樣'
         }
-        vm.$bus.$emit('alertmessage', msg)
+        vm.$store.dispatch('alertMessageModules/openToast', msg)
       } else {
         const data = {
           product: id,
@@ -318,14 +318,14 @@ export default {
             icon: 'success',
             title: '更新購物車成功'
           }
-          vm.$bus.$emit('alertmessage', msg)
+          vm.$store.dispatch('alertMessageModules/openToast', msg)
         }).catch(() => {
           vm.$store.dispatch('updateLoading', false, { root: true })
           const msg = {
             icon: 'error',
             title: '更新購物車失敗'
           }
-          vm.$bus.$emit('alertmessage', msg)
+          vm.$store.dispatch('alertMessageModules/openToast', msg)
         })
       }
     },
@@ -357,7 +357,7 @@ export default {
           icon: 'success',
           title: '已刪除此筆資料'
         }
-        vm.$bus.$emit('alertmessage', msg)
+        vm.$store.dispatch('alertMessageModules/openToast', msg)
 
         vm.$emit('get-carts')
         vm.getCarts()
@@ -367,7 +367,7 @@ export default {
           icon: 'error',
           title: '刪除購物車失敗'
         }
-        vm.$bus.$emit('alertmessage', msg)
+        vm.$store.dispatch('alertMessageModules/openToast', msg)
       })
     },
     getCoupon () {
@@ -380,11 +380,11 @@ export default {
       if (!vm.couponInput) {
         vm.$store.dispatch('updateLoading', false, { root: true })
         const msg = {
-          title: '錯誤',
+          title: '發生錯誤',
           text: '請輸入折價劵代碼',
           status: 'danger'
         }
-        vm.$bus.$emit('alertmessage', msg, 'modal')
+        vm.$store.dispatch('alertMessageModules/openModal', msg)
         return
       }
 
@@ -394,17 +394,17 @@ export default {
         vm.$store.dispatch('updateLoading', false, { root: true })
         const msg = {
           icon: 'success',
-          title: '已成功使用此 Coupon 券'
+          title: '已使用折價券'
         }
-        vm.$bus.$emit('alertmessage', msg)
+        vm.$store.dispatch('alertMessageModules/openToast', msg)
         vm.couponInput = ''
       }).catch(() => {
         vm.$store.dispatch('updateLoading', false, { root: true })
         const msg = {
           icon: 'error',
-          title: '出錯了~ 此 Coupon 券無效'
+          title: '折價券無效'
         }
-        vm.$bus.$emit('alertmessage', msg)
+        vm.$store.dispatch('alertMessageModules/openToast', msg)
       })
     },
     createOrder () {
@@ -417,7 +417,7 @@ export default {
         vm.$emit('get-carts')
         vm.$swal({
           title: '已成立訂單',
-          text: '訂單已成立，請盡速結帳喔!!',
+          text: '訂單已成立，請繼續結帳',
           showCancelButton: false,
           confirmButtonColor: '#28a745',
           allowOutsideClick: false,
@@ -431,11 +431,11 @@ export default {
       }).catch(() => {
         vm.$store.dispatch('updateLoading', false, { root: true })
         const msg = {
-          title: '錯誤',
-          text: '出錯了~ 請重新訂購',
+          title: '發生錯誤',
+          text: '請重新訂購',
           status: 'danger'
         }
-        vm.$bus.$emit('alertmessage', msg, 'modal')
+        vm.$store.dispatch('alertMessageModules/openModal', msg)
       })
     }
   },

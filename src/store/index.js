@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import alertMessageModules from './modules/alertMessage'
 
 Vue.use(Vuex)
 
@@ -23,5 +24,6 @@ export default new Vuex.Store({
     isLoading: (state) => state.isLoading
   },
   modules: {
+    alertMessageModules
   }
 })

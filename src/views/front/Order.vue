@@ -117,8 +117,8 @@ export default {
       }).catch(() => {
         vm.$store.dispatch('updateLoading', false, { root: true })
         vm.$swal({
-          title: '出錯了',
-          text: '糟糕，找不到此訂單，將返回首頁',
+          title: '發生錯誤',
+          text: '找不到此訂單，將返回首頁',
           confirmButtonColor: '#dc3545',
           allowOutsideClick: false,
           confirmButtonText: '確認',
@@ -157,7 +157,7 @@ export default {
           icon: 'error',
           title: '付款失敗'
         }
-        vm.$bus.$emit('alertmessage', msg)
+        vm.$store.dispatch('alertMessageModules/openToast', msg)
       })
     }
   },
