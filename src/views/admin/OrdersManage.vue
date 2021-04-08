@@ -38,7 +38,7 @@
         </tbody>
       </table>
     </div>
-    <Pagination :pages="pagination" @get-data="getOrders" />
+    <Pagination @get-data="getOrders"/>
   </div>
 </template>
 
@@ -61,7 +61,7 @@ export default {
       vm.$http.get(url).then((res) => {
         vm.$store.dispatch('updateLoading', false, { root: true })
         vm.orders = res.data.data
-        vm.pagination = res.data.meta.pagination
+        vm.$store.dispatch('paginationModules/getPagination', { routerName: this.$route.name, data: res.data })
         vm.$store.dispatch('updateLoading', false, { root: true })
       })
     },

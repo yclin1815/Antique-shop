@@ -1,6 +1,6 @@
 <template>
   <div class="products-wrap">
-    <div class="pagebanner" :style="{backgroundImage: 'url(' + bannerImg + ')'}"></div>
+    <div class="pagebanner" :style="{backgroundImage: 'url(' + categoryImg + ')'}"></div>
     <div class="container-fluid products">
       <div class="row">
         <div class="col-12 col-md-5 col-lg-3">
@@ -75,7 +75,7 @@
             </div>
           </div>
           <div class="products-pagination">
-            <Pagination :pages="pagination" @get-data="changePage"/>
+            <Pagination @get-data="changePage"/>
           </div>
         </div>
       </div>
@@ -86,161 +86,51 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import Pagination from '@/components/Pagination.vue'
-import bannerImgAllmenu from '@/assets/images/banner-allmenu.jpg'
-import bannerImgFurniture from '@/assets/images/banner-furniture.jpg'
-import bannerImgDeco from '@/assets/images/banner-deco.jpg'
-import bannerImgCamera from '@/assets/images/banner-camera.jpg'
-import bannerImgKitchen from '@/assets/images/banner-kitchen.jpg'
-import bannerImgCar from '@/assets/images/banner-car.jpg'
+
 export default {
   name: 'Products',
   data () {
     return {
-      // 頁面相關
-      currentPage: 1, // 所在頁面
-      pagination: {
-        perpage: 6, // 一面有幾個商品
-        result_length: 0, // 商品數量
-        total_pages: 1, // 總共有幾頁
-        current_page: 1 // 所在頁面
-      },
-      products: [],
-      favorites: {},
       searchText: '',
       filterText: '',
-      filterCategory: '全部商品',
-      bannerImg: bannerImgAllmenu,
-      categories: [
-        {
-          title: '全部商品',
-          bannerImg: bannerImgAllmenu
-        },
-        {
-          title: '家具商品',
-          bannerImg: bannerImgFurniture
-        },
-        {
-          title: '佈置擺飾',
-          bannerImg: bannerImgDeco
-        },
-        {
-          title: '底片相機',
-          bannerImg: bannerImgCamera
-        },
-        {
-          title: '廚房道具',
-          bannerImg: bannerImgKitchen
-        },
-        {
-          title: '古董汽車',
-          bannerImg: bannerImgCar
-        }
-      ]
+      filterCategory: '全部商品'
     }
   },
   methods: {
-    getProducts () {
-      const vm = this
-      const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/products`
-      vm.$store.dispatch('updateLoading', true, { root: true })
-      vm.$http.get(url).then((res) => {
-        vm.products = res.data.data
-        vm.pagination = res.data.meta.pagination
-        // 設定預設頁碼
-        const resultLen = vm.products.length
-        vm.pagination = {
-          perpage: 6, // 一面有幾個商品
-          result_length: resultLen,
-          total_pages: Math.ceil(resultLen / Number(vm.pagination.perpage)),
-          current_page: 1
-        }
-        vm.getFavorites()
-        vm.getQuery()
-        vm.$store.dispatch('updateLoading', false, { root: true })
-      })
-    },
     updateCartItem (id, num) {
-      const vm = this
-      let n = 0
-      let method = 'post'
-      n = Number(num)
-      const isInCart = vm.carts.filter((item) => item.product.id === id)
-      if (isInCart.length > 0) {
-        method = 'patch'
-        n = Number(isInCart[0].quantity) + Number(num)
-      }
-      vm.$store.dispatch('cartModules/updateCartItem', { id, num: n, method })
+      this.$store.dispatch('cartModules/updateCartItem', { id, num, method: 'add' })
     },
-    getFavorites () {
-      const vm = this
-      vm.favorites = JSON.parse(localStorage.getItem('favoriteData')) || []
-      // 查詢各商品是否有在喜愛商品中，有則加入 isFavorite:true，否則加入 isFavorite:false
-      vm.products.forEach((productItem, index) => {
-        this.$set(vm.products[index], 'isFavorite', false)
-        vm.favorites.forEach((favoriteItem) => {
-          if (productItem.id === favoriteItem.id) {
-            this.$set(vm.products[index], 'isFavorite', true)
+    getData () {
+      const { categoryName } = this.$route.query
+      this.$store.dispatch('favoriteModules/getFavorites')
+        .then(() => this.$store.dispatch('productsModules/getProducts', { routerName: this.$route.name }))
+        .then(() => {
+          if (categoryName) {
+            this.getCategory({ title: categoryName })
+          } else {
+            this.$store.dispatch('paginationModules/getPagination', { routerName: this.$route.name, data: this.products })
           }
         })
-      })
     },
     addFavorite (item) {
-      const vm = this
-      const favoriteData = {
-        id: item.id,
-        title: item.title,
-        imageUrl: item.imageUrl[0]
-      }
-      vm.favorites.push(favoriteData)
-      localStorage.setItem('favoriteData', JSON.stringify(vm.favorites))
-      const msg = {
-        icon: 'success',
-        title: '已加入喜愛商品'
-      }
-      vm.$store.dispatch('alertMessageModules/openToast', msg)
-      vm.$emit('get-favorites')
-      vm.getFavorites()
+      this.$store.dispatch('favoriteModules/addFavorite', item)
+        .then(() => {
+          this.$store.dispatch('productsModules/getProducts', { routerName: this.$route.name })
+        })
     },
     delFavoriteItem (item) {
-      const vm = this
-      vm.favorites.forEach((favoriteItem, index) => {
-        if (favoriteItem.id === item.id) {
-          vm.favorites.splice(index, 1)
-        }
-      })
-      localStorage.setItem('favoriteData', JSON.stringify(vm.favorites))
-      const msg = {
-        icon: 'success',
-        title: '已刪除喜愛商品'
-      }
-      vm.$store.dispatch('alertMessageModules/openToast', msg)
-      vm.$emit('get-favorites')
-      vm.getFavorites()
-    },
-    getQuery () {
-      const vm = this
-      const { categoryName } = vm.$route.query
-      if (categoryName) {
-        vm.filterCategory = categoryName
-        vm.categories.forEach((item, index) => {
-          if (item.title === vm.filterCategory) {
-            vm.bannerImg = vm.categories[index].bannerImg
-          }
+      this.$store.dispatch('favoriteModules/delFavoriteItem', item)
+        .then(() => {
+          this.$store.dispatch('productsModules/getProducts', { routerName: this.$route.name })
         })
-      }
     },
     getCategory (category) {
       const vm = this
       vm.filterCategory = category.title
       // 切換分類，更換封面圖
-      vm.categories.forEach((item, index) => {
-        if (item.title === vm.filterCategory) {
-          vm.bannerImg = vm.categories[index].bannerImg
-        }
-      })
-      // 切換分類，所在頁面變為第一頁
-      vm.currentPage = 1
-      vm.pagination.current_page = 1
+      vm.$store.dispatch('productsModules/updateCategoryImg', vm.filterCategory)
+      // 切換分類，更新頁碼資訊
+      vm.$store.dispatch('paginationModules/updatePagination', vm.newProducts)
       // 切換分類，清除搜尋
       if (vm.filterText) {
         vm.filterText = ''
@@ -252,6 +142,8 @@ export default {
         vm.filterCategory = '全部商品'
         vm.filterText = vm.searchText
         vm.searchText = ''
+        // 切換分類，更新頁碼資訊
+        vm.$store.dispatch('paginationModules/updatePagination', vm.newProducts)
       } else {
         const msg = {
           title: '請輸入搜尋文字',
@@ -262,60 +154,55 @@ export default {
       }
     },
     changePage (currentPage) {
-      this.currentPage = currentPage
-      this.pagination.current_page = Number(currentPage)
+      this.$store.dispatch('paginationModules/updateCurrentPage', currentPage)
     },
     ...mapActions('cartModules', ['getCarts'])
   },
   computed: {
-    filterData () {
+    newProducts () {
       const vm = this
-      const data = []
-      let newProducts = vm.products
 
       // 有搜尋字串
       if (vm.filterText) {
         vm.filterCategory = '全部商品'
-        newProducts = vm.products.filter((item) => item.title.indexOf(vm.filterText) !== -1)
+        return vm.products.filter((item) => item.title.indexOf(vm.filterText) !== -1)
       }
-      // 分類不為全部商品
+      // 分類不為全部
       if (vm.filterCategory !== '全部商品') {
-        newProducts = vm.products.filter((item) => item.category === vm.filterCategory)
+        return vm.products.filter((item) => item.category === vm.filterCategory)
       }
+      return vm.products
+    },
+    filterData () {
+      const vm = this
+      const data = []
 
-      // 當前顯示頁面資料、設定頁碼資訊
-      const resultLen = Number(newProducts.length)
+      // 顯示當前頁面資料
       const perpage = Number(vm.pagination.perpage)
-      vm.pagination.result_length = resultLen
-      vm.pagination.total_pages = Math.ceil(resultLen / perpage)
+      const currentPage = Number(vm.pagination.current_page)
 
-      // 此頁碼最小資料為第?筆
-      const minItem = (vm.currentPage * perpage) - perpage + 1
+      // 取此頁碼最大及最小資料為第?筆
+      const minItem = (currentPage * perpage) - perpage + 1
+      const maxItem = currentPage * perpage
 
-      // 此頁碼最大資料為第?筆
-      const maxItem = vm.currentPage * perpage
-
-      // 只取當前頁面資料
-      newProducts.forEach((item, i) => {
-        // 配合  minItem 及  maxItem 從 1 開始，所以 +1
+      vm.newProducts.forEach((item, i) => {
         const itemNum = i + 1
-        // 每頁 6 筆，以第 2 頁為例，只取第 7~12 筆
         if (itemNum >= minItem && itemNum <= maxItem) {
           data.push(item)
         }
       })
-      newProducts = data
-
-      return newProducts
+      return data
     },
-    ...mapGetters('cartModules', ['carts'])
+    ...mapGetters('cartModules', ['carts']),
+    ...mapGetters('productsModules', ['products', 'categories', 'categoryImg']),
+    ...mapGetters('favoriteModules', ['favorites']),
+    ...mapGetters('paginationModules', ['pagination'])
   },
   components: {
     Pagination
   },
   created () {
-    const vm = this
-    vm.getProducts()
+    this.getData()
     this.$store.dispatch('cartModules/getCarts')
   }
 }

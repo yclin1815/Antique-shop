@@ -1,13 +1,15 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import alertMessageModules from './modules/alertMessage'
+import paginationModules from './modules/pagination'
+import productsModules from './modules/products'
+import favoriteModules from './modules/favorite'
 import cartModules from './modules/cart'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
-  strict: true, // 嚴謹模式
-
+  strict: true,
   state: {
     isLoading: false
   },
@@ -26,6 +28,9 @@ export default new Vuex.Store({
   },
   modules: {
     alertMessageModules,
+    paginationModules,
+    productsModules,
+    favoriteModules,
     cartModules
   }
 })

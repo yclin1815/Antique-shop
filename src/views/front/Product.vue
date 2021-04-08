@@ -1,6 +1,6 @@
 <template>
   <div class="product-wrap">
-    <div class="pagebanner" :style="{backgroundImage: 'url(' + bannerImg + ')'}">
+    <div class="pagebanner" :style="{backgroundImage: 'url(' + categoryImg + ')'}">
     </div>
     <div class="container">
       <nav aria-label="breadcrumb" class="mb-4">
@@ -88,12 +88,6 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
-import bannerImgAllmenu from '@/assets/images/banner-allmenu.jpg'
-import bannerImgFurniture from '@/assets/images/banner-furniture.jpg'
-import bannerImgDeco from '@/assets/images/banner-deco.jpg'
-import bannerImgCamera from '@/assets/images/banner-camera.jpg'
-import bannerImgKitchen from '@/assets/images/banner-kitchen.jpg'
-import bannerImgCar from '@/assets/images/banner-car.jpg'
 import { Swiper, SwiperSlide } from 'vue-awesome-swiper'
 import 'swiper/css/swiper.css'
 
@@ -102,38 +96,8 @@ export default {
   data () {
     return {
       categoryName: '',
-      product: {},
-      relatedProducts: [],
-      favorites: [],
-      isFavorite: false,
       counterNum: 1,
-      bannerImg: '',
-      categories: [
-        {
-          title: '全部商品',
-          bannerImg: bannerImgAllmenu
-        },
-        {
-          title: '家具商品',
-          bannerImg: bannerImgFurniture
-        },
-        {
-          title: '佈置擺飾',
-          bannerImg: bannerImgDeco
-        },
-        {
-          title: '底片相機',
-          bannerImg: bannerImgCamera
-        },
-        {
-          title: '廚房道具',
-          bannerImg: bannerImgKitchen
-        },
-        {
-          title: '古董汽車',
-          bannerImg: bannerImgCar
-        }
-      ],
+      routerName: this.$route.name,
       swiperOption: {
         slidesPerView: 1,
         spaceBetween: 30,
@@ -170,111 +134,61 @@ export default {
           break
       }
     },
-    getRelated (category) {
-      const vm = this
-      const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/products`
-      vm.$store.dispatch('updateLoading', true, { root: true })
-      vm.$http.get(url).then((res) => {
-        vm.relatedProducts = res.data.data.filter(
-          (item) => item.category === category && item.id !== vm.product.id
-        )
-        vm.$store.dispatch('updateLoading', false, { root: true })
-      })
-    },
-    getProduct (id) {
-      const vm = this
-      const url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/ec/product/${id}`
-      vm.$store.dispatch('updateLoading', true, { root: true })
-      vm.$http.get(url).then((res) => {
-        vm.product = res.data.data
-        vm.getRelated(vm.product.category)
-        vm.getFavorites()
-        vm.$store.dispatch('updateLoading', false, { root: true })
-        // 依分類設定封面圖
-        vm.categories.forEach((item, index) => {
-          if (item.title === vm.product.category) {
-            vm.bannerImg = vm.categories[index].bannerImg
-          }
+    getData () {
+      const { productId } = this.$route.params
+      this.$store.dispatch('productsModules/getProduct', { productId })
+        .catch(() => {
+          this.$swal({
+            title: '發生錯誤',
+            text: '找不到此商品，將返回商品頁',
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: '確認',
+            customClass: {
+              title: 'swal-title swal-title-danger'
+            }
+          }).then(() => {
+            this.$router.push('/products')
+          })
         })
-      }).catch(() => {
-        vm.$store.dispatch('updateLoading', false, { root: true })
-        vm.$swal({
-          title: '錯誤',
-          text: '找不到此商品',
-          confirmButtonColor: '#dc3545',
-          confirmButtonText: '確認',
-          customClass: {
-            title: 'swal-title swal-title-danger'
-          }
-        }).then(() => {
-          vm.$router.push('/products')
-        })
-      })
+
+      this.$store.dispatch('favoriteModules/getFavorites')
+        .then(() => this.$store.dispatch('productsModules/getProducts', { routerName: this.$route.name, productId }))
     },
     updateCartItem (id, num) {
       this.$store.dispatch('cartModules/updateCartItem', { id, num, method: 'add' })
     },
-    getFavorites () {
-      const vm = this
-      vm.favorites = JSON.parse(localStorage.getItem('favoriteData')) || []
-      // 查詢此商品是否在喜愛商品中
-      vm.isFavorite = false
-      vm.favorites.forEach((favoriteItem) => {
-        if (vm.product.id === favoriteItem.id) {
-          vm.isFavorite = true
-        }
-      })
-    },
     addFavorite (item) {
-      const vm = this
-      const favoriteData = {
-        id: item.id,
-        title: item.title,
-        imageUrl: item.imageUrl[0]
-      }
-      vm.favorites.push(favoriteData)
-      localStorage.setItem('favoriteData', JSON.stringify(vm.favorites))
-
-      const msg = {
-        icon: 'success',
-        title: '已加入喜愛商品'
-      }
-      vm.$store.dispatch('alertMessageModules/openToast', msg)
-
-      vm.$emit('get-favorites')
-      vm.getFavorites()
+      this.$store.dispatch('favoriteModules/addFavorite', item)
     },
     delFavoriteItem (item) {
-      const vm = this
-      vm.favorites.forEach((favoriteItem, index) => {
-        if (favoriteItem.id === item.id) {
-          vm.favorites.splice(index, 1)
-        }
-      })
-      localStorage.setItem('favoriteData', JSON.stringify(vm.favorites))
-
-      const msg = {
-        icon: 'success',
-        title: '已刪除喜愛商品'
-      }
-      vm.$store.dispatch('alertMessageModules/openToast', msg)
-
-      vm.$emit('get-favorites')
-      vm.getFavorites()
+      this.$store.dispatch('favoriteModules/delFavoriteItem', item)
     },
     ...mapActions('cartModules', ['getCarts'])
   },
   computed: {
-    ...mapGetters('cartModules', ['carts'])
+    isFavorite () {
+      let isFavorite = false
+      this.favorites.forEach((favoriteItem) => {
+        if (this.product.id === favoriteItem.id) {
+          isFavorite = true
+        }
+      })
+      return isFavorite
+    },
+    relatedProducts () {
+      return this.products.filter((item) => item.category === this
+        .product.category && item.id !== this.product.id)
+    },
+    ...mapGetters('cartModules', ['carts']),
+    ...mapGetters('favoriteModules', ['favorites']),
+    ...mapGetters('productsModules', ['products', 'product', 'categories', 'categoryImg'])
   },
   components: {
     Swiper,
     SwiperSlide
   },
   created () {
-    const id = this.$route.params.productId
-    const vm = this
-    vm.getProduct(id)
+    this.getData()
     this.$store.dispatch('cartModules/getCarts')
   }
 }

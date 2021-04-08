@@ -11,7 +11,7 @@
             <router-link to="/" class="menu-link">HOME</router-link>
           </li>
           <li>
-            <router-link to="/products" class="menu-link">PRODUCTS</router-link>
+            <router-link to="/products" class="menu-link" :class="{'active': $route.name === 'Products' && 'router-link-active'}">PRODUCTS</router-link>
           </li>
           <li>
             <router-link to="/about" class="menu-link">ABOUT</router-link>
@@ -27,7 +27,7 @@
               <span class="toolbar-num">{{ favoritesNum }}</span>
             </a>
             <div class="dropdown-menu dropdown-menu-right px-2">
-              <h5 class="text-center">我的最愛</h5>
+              <h5 class="text-center">喜愛商品</h5>
               <table class="table table-hover mb-1" style="min-width: 300px;">
                 <tbody>
                   <tr v-for="favorite in favorites" :key="favorite.key">
@@ -49,7 +49,7 @@
                 </tbody>
               </table>
               <div v-if="!favoritesNum">
-                <p class="mb-2 text-center text-muted" v-if="!favoritesNum">我的最愛無商品</p>
+                <p class="mb-2 text-center text-muted" v-if="!favoritesNum">無喜愛商品</p>
                 <router-link to="/products" class="btn btn-block btn-dark">看更多商品</router-link>
               </div>
               <a href="#" class="btn btn-block btn-outline-danger"
@@ -112,7 +112,7 @@
         </ul>
       </div>
     </div>
-    <router-view @get-favorites="getFavorites" :key="$route.fullPath" ref="view">
+    <router-view :key="$route.fullPath" ref="view">
     </router-view>
     <div class="footer">
       ⓒ 2021 Antique
@@ -129,24 +129,27 @@ export default {
     return {
       scrollHeader: false,
       isMenuOpen: false,
-      favorites: [],
-      favoritesNum: 0
+      routerName: this.$route.name
     }
   },
   methods: {
     delCartItem (id) {
       this.$store.dispatch('cartModules/delCartItem', id)
     },
-    getFavorites () {
-      const vm = this
-      vm.favorites = JSON.parse(localStorage.getItem('favoriteData')) || []
-      vm.favoritesNum = vm.favorites.length
+    delFavoriteItem (item) {
+      const { routerName } = this
+      this.$store.dispatch('favoriteModules/delFavoriteItem', item)
+        .then(() => {
+          if (routerName === 'Products') {
+            this.$store.dispatch('productsModules/getProducts', { routerName })
+          }
+        })
     },
     delFavoriteAll () {
-      const vm = this
-      vm.$swal({
-        title: '刪除我的最愛',
-        text: '確定要刪除全部我的最愛 (刪除後無法復原)',
+      const { routerName } = this
+      this.$swal({
+        title: '刪除喜愛商品',
+        text: '確定要刪除全部喜愛商品 (刪除後無法復原)',
         showCancelButton: true,
         confirmButtonColor: '#dc3545',
         cancelButtonColor: '#343a40',
@@ -157,57 +160,25 @@ export default {
         }
       }).then((result) => {
         if (result.isConfirmed) {
-          localStorage.removeItem('favoriteData')
-
-          const msg = {
-            icon: 'success',
-            title: '已刪除全部我的最愛'
-          }
-          vm.$store.dispatch('alertMessageModules/openToast', msg)
-
-          vm.getFavorites()
-
-          // 若在 Products 或 Product 頁則重整內頁我的最愛
-          const routerName = vm.$refs.view.$route.name
-          if (routerName === 'Products' || routerName === 'Product') {
-            vm.$refs.view.getFavorites()
-          }
+          this.$store.dispatch('favoriteModules/delFavoriteAll')
+            .then(() => {
+              if (routerName === 'Products') {
+                this.$store.dispatch('productsModules/getProducts', { routerName })
+              }
+            })
         }
       })
-    },
-    delFavoriteItem (item) {
-      const vm = this
-      vm.favorites.forEach((favoriteItem, index) => {
-        if (favoriteItem.id === item.id) {
-          vm.favorites.splice(index, 1)
-        }
-      })
-      localStorage.setItem('favoriteData', JSON.stringify(vm.favorites))
-
-      const msg = {
-        icon: 'success',
-        title: '已刪除我的最愛'
-      }
-      vm.$store.dispatch('alertMessageModules/openToast', msg)
-
-      vm.getFavorites()
-
-      // 若在 Products 或 Product 頁則重整內頁我的最愛
-      const routerName = vm.$refs.view.$route.name
-      if (routerName === 'Products' || routerName === 'Product') {
-        vm.$refs.view.getFavorites()
-      }
     },
     scrollPage () {
       const vm = this
       const scrollTop = $(window).scrollTop()
-      const { path } = vm.$route
+      const { routerName } = this
       switch (true) {
-        case path === '/' && scrollTop > 0:
+        case routerName === 'Home' && scrollTop > 0:
           window.addEventListener('scroll', vm.scrollPage)
           vm.scrollHeader = true
           break
-        case path === '/':
+        case routerName === 'Home':
           window.addEventListener('scroll', vm.scrollPage)
           vm.scrollHeader = false
           break
@@ -221,21 +192,23 @@ export default {
   },
   computed: {
     ...mapGetters(['isLoading']),
-    ...mapGetters('cartModules', ['carts', 'cartNum'])
+    ...mapGetters('cartModules', ['carts', 'cartNum']),
+    ...mapGetters('favoriteModules', ['favorites', 'favoritesNum'])
   },
   watch: {
     $route (to, from) {
+      const vm = this
       if (to.path !== from.path) {
-        const vm = this
-        vm.scrollPage()
+        vm.routerName = to.name
         vm.isMenuOpen = false
+        vm.scrollPage()
       }
     }
   },
   created () {
     const vm = this
     vm.$store.dispatch('cartModules/getCarts')
-    vm.getFavorites()
+    vm.$store.dispatch('favoriteModules/getFavorites')
     vm.scrollPage()
   }
 }
