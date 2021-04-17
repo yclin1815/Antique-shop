@@ -61,11 +61,7 @@
         </div>
       </ValidationObserver>
     </div>
-    <div class="contact">
-      <div class="contact-map">
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3640.7638693303306!2d120.6604659649888!3d24.144929384396363!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x34693da1ca018bd3%3A0xdf6594a4c18d0e9f!2z5a-p6KiIMzY45paw5Ym16IGa6JC9!5e0!3m2!1szh-TW!2stw!4v1617547471591!5m2!1szh-TW!2stw" frameborder="0" style="border: 0" allowfullscreen="" aria-hidden="false" tabindex="0">
-      </iframe>
-      </div>
+    <div class="contact contact-reverse">
       <div class="contact-info" data-aos="zoom-in" data-aos-duration="1000">
         <h2 class="contact-title">
           聯絡資訊
@@ -111,7 +107,10 @@
           </li>
         </ul>
       </div>
-
+      <div class="contact-map">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3640.7638693303306!2d120.6604659649888!3d24.144929384396363!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x34693da1ca018bd3%3A0xdf6594a4c18d0e9f!2z5a-p6KiIMzY45paw5Ym16IGa6JC9!5e0!3m2!1szh-TW!2stw!4v1617547471591!5m2!1szh-TW!2stw" frameborder="0" style="border: 0" allowfullscreen="" aria-hidden="false" tabindex="0">
+        </iframe>
+      </div>
     </div>
   </div>
 </template>
@@ -159,6 +158,11 @@ export default {
   }
 }
 
+.contact-reverse{
+  @include desktop-s {
+    flex-direction: row-reverse;
+  }
+}
 .contact-info {
   width: 100%;
   padding: 3rem 0;

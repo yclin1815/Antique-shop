@@ -335,9 +335,9 @@ export default {
     updateProduct () {
       const vm = this
       let url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/admin/ec/product`
+      let statusTitle = '新增'
+      let method = 'post'
       if (vm.status === 'update') {
-        var statusTitle = '新增'
-        var method = 'post'
         method = 'patch'
         url = `${process.env.VUE_APP_APIPATH}/${process.env.VUE_APP_UUID}/admin/ec/product/${vm.tempProduct.id}`
         statusTitle = '更新'
